@@ -38,7 +38,7 @@
                     <el-row :gutter="24" v-else>
                         <el-col :span="8" v-for="article in articles" :key="article.id">
                             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
-                                <img :src="article.img || 'https://placehold.co/300x150'" alt="封面图"
+                                <img :src="article.firstpicture || 'https://placehold.co/300x150'" alt="封面图"
                                     class="article-img" />
                                 <h3 class="article-title">{{ article.title }}</h3>
                                 <p class="article-description">{{ truncate(article.description, 35) }}</p>
@@ -88,13 +88,13 @@ const handleLogin = () => {
 
 // 摘要截断函数
 const truncate = (text, maxLen) => {
-  return text?.length <= maxLen ? text : text?.slice(0, maxLen) + '...'
+    return text?.length <= maxLen ? text : text?.slice(0, maxLen) + '...'
 }
 
 const getArticleLatest = async () => {
     try {
         loading.value = true
-        const res = await getArticleLatestService(3)
+        const res = await getArticleLatestService(6)
         articles.value = res.data || []
     } catch (error) {
         console.error('获取最新文章失败:', error)
@@ -162,38 +162,38 @@ const goToArticle = (id) => {
 }
 
 .article-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin: 20px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 20px 0;
 }
 
 .article-card:hover {
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
-  transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
+    transform: scale(1.03);
 }
 
 .article-img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 10px;
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
 }
 
 .article-title {
-  margin: 0 0 8px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
 }
 
 .article-description {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 12px;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
 }
 
 .loading {
-  padding: 20px;
+    padding: 20px;
 }
 </style>
