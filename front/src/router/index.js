@@ -30,10 +30,15 @@ const routes = [
   // },
   {
     path: '/article',
-    component: ArticleVue
+    name: 'Article',
+    component: ArticleVue,
+    meta: {
+      keepAlive: true // 需要被缓存
+    }
   },
   {
     path: '/article/:id',
+    name: 'ArticleDetail',
     component: ArticleDetailVue
   },
   {

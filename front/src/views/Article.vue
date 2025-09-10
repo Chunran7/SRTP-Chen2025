@@ -88,6 +88,13 @@ const truncate = (text, maxLen) => {
   return text?.length <= maxLen ? text : text?.slice(0, maxLen) + '...'
 }
 
+// 当从缓存中激活组件时调用
+import { onActivated } from 'vue'
+onActivated(() => {
+  // 可以选择在每次返回页面时刷新数据，或者注释掉下面这行以保持数据不变
+  // getArticleList()
+})
+
 onMounted(() => {
   getArticleList()
 })

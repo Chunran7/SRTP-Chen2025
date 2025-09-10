@@ -32,13 +32,16 @@
                 <!-- 最新文章 -->
                 <section class="articles">
                     <h1 class="section-title">最新文章</h1>
-                    <el-row :gutter="20">
-                        <el-col :span="8" v-for="(article, index) in articles" :key="index">
-                            <el-card :body-style="{ padding: '20px' }" shadow="hover">
-                                <img :src="article.img" class="article-img" alt="文章封面" />
-                                <h3 style="margin: 10px 0;">{{ article.title }}</h3>
-                                <p class="article-summary">{{ article.summary }}</p>
-                                <el-button type="primary" size="small" @click="goToArticle(article.id)">阅读更多</el-button>
+                    <div v-if="loading" class="loading">
+                        <el-skeleton :rows="3" animated />
+                    </div>
+                    <el-row :gutter="24" v-else>
+                        <el-col :span="8" v-for="article in articles" :key="article.id">
+                            <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
+                                <img :src="article.img || 'https://placehold.co/300x150'" alt="封面图"
+                                    class="article-img" />
+                                <h3 class="article-title">{{ article.title }}</h3>
+                                <p class="article-description">{{ truncate(article.description, 35) }}</p>
                             </el-card>
                         </el-col>
                     </el-row>
@@ -68,38 +71,42 @@
 
 <script setup>
 import Navbar from '@/components/Navbar.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '@/components/Footer.vue'
+import { getArticleLatestService } from '@/api/article.js'
 
 const activeIndex = ref('1')
 const isLoggedIn = ref(false)
 const router = useRouter()
+const articles = ref([])
+const loading = ref(true)
 
 const handleLogin = () => {
     router.push('/login')
 }
 
-const articles = ref([
-    {
-        id: 1,
-        title: '如何调节焦虑情绪',
-        summary: '焦虑是现代人常见的问题，本文介绍几种有效的情绪调节方法...',
-        img: 'https://placehold.co/300x150'
-    },
-    {
-        id: 2,
-        title: '情绪急救包的使用指南',
-        summary: '面对突发情绪崩溃，我们可以准备一个“心理急救包”来帮助自己...',
-        img: 'https://placehold.co/300x150'
-    },
-    {
-        id: 3,
-        title: '倾听的力量：做一个好倾听者',
-        summary: '在朋友倾诉时，如何成为一个有力的支持者？掌握同理心倾听技巧...',
-        img: 'https://placehold.co/300x150'
+// 摘要截断函数
+const truncate = (text, maxLen) => {
+  return text?.length <= maxLen ? text : text?.slice(0, maxLen) + '...'
+}
+
+const getArticleLatest = async () => {
+    try {
+        loading.value = true
+        const res = await getArticleLatestService(3)
+        articles.value = res.data || []
+    } catch (error) {
+        console.error('获取最新文章失败:', error)
+        articles.value = []
+    } finally {
+        loading.value = false
     }
-])
+}
+
+onMounted(() => {
+    getArticleLatest()
+})
 
 const videos = ref([
     { title: '如何进行情绪自我疏导', url: 'https://www.youtube.com/embed/tgbNymZ7vqY' },
@@ -154,17 +161,39 @@ const goToArticle = (id) => {
     padding-bottom: 10px;
 }
 
-.article-img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 10px;
+.article-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 20px 0;
 }
 
-.article-summary {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 12px;
+.article-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
+  transform: scale(1.03);
+}
+
+.article-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.article-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.article-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.loading {
+  padding: 20px;
 }
 </style>
