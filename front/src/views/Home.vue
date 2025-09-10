@@ -18,7 +18,7 @@
                     <h1 class="section-title">介绍我们</h1>
                     <el-row gutter="40">
                         <el-col :span="12">
-                            <img src="https://placehold.co/400x200" alt="图片描述"
+                            <img src="/images/introduction.png" alt="图片描述"
                                 style="width: 100%; height: auto; border-radius: 6px;" />
                         </el-col>
                         <el-col :span="12">

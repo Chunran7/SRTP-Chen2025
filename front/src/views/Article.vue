@@ -6,17 +6,19 @@
       <div class="content">
         <h1 class="section-title">文章列表</h1>
 
-        <!-- 文章列表 -->
+        <!-- 加载状态 -->
+        <div v-if="loading" class="loading">
+          <el-skeleton :rows="5" animated />
+        </div>
 
-        <el-row :gutter="24">
+        <!-- 文章列表 -->
+        <el-row :gutter="24" v-else>
           <el-col :span="8" v-for="article in pagedArticles" :key="article.id">
             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
-              <img :src="article.img" alt="封面图" class="article-img" />
+              <img :src="article.img || 'https://placehold.co/300x150'" alt="封面图" class="article-img" />
               <h3 class="article-title">{{ article.title }}</h3>
-              <p class="article-summary">{{ truncate(article.summary, 100) }}</p>
-              <div class="article-footer">
-                <el-button type="primary" size="small">阅读更多</el-button>
-              </div>
+              <p class="article-description">{{ truncate(article.description, 35) }}</p>
+
             </el-card>
           </el-col>
         </el-row>
@@ -34,23 +36,41 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { getArticleListService } from '@/api/article.js'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 
 const router = useRouter()
 
-// 所有文章数据
-const articles = ref(Array.from({ length: 42 }, (_, i) => ({
-  id: i + 1,
-  title: `文章标题 ${i + 1}`,
-  summary: `这是第 ${i + 1} 篇文章的摘要内容，简要描述文章主要内容，让用户快速了解文章。`,
-  img: 'https://placehold.co/300x150'
-})))
+// 文章数据
+const articles = ref([])
+// 加载状态
+const loading = ref(true)
 
 const pageSize = 9
 const currentPage = ref(1)
+
+// 获取文章列表
+const getArticleList = async () => {
+  try {
+    loading.value = true
+    const res = await getArticleListService()
+    articles.value = res.data
+  } catch (error) {
+    console.error('获取文章列表失败:', error)
+    // 模拟数据用于演示
+    articles.value = Array.from({ length: 42 }, (_, i) => ({
+      id: i + 1,
+      title: `文章标题 ${i + 1}`,
+      description: `这是第 ${i + 1} 篇文章的摘要内容，简要描述文章主要内容，让用户快速了解文章。`,
+      img: 'https://placehold.co/300x150'
+    }))
+  } finally {
+    loading.value = false
+  }
+}
 
 // 当前页的文章
 const pagedArticles = computed(() => {
@@ -65,8 +85,12 @@ const goToArticle = (id) => {
 
 // 摘要截断
 const truncate = (text, maxLen) => {
-  return text.length <= maxLen ? text : text.slice(0, maxLen) + '...'
+  return text?.length <= maxLen ? text : text?.slice(0, maxLen) + '...'
 }
+
+onMounted(() => {
+  getArticleList()
+})
 </script>
 
 <style scoped>
@@ -98,10 +122,12 @@ const truncate = (text, maxLen) => {
 .article-card {
   cursor: pointer;
   transition: all 0.3s ease;
+  margin: 20px 0;
 }
 
 .article-card:hover {
   box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
+  transform: scale(1.03);
 }
 
 .article-img {
@@ -119,7 +145,7 @@ const truncate = (text, maxLen) => {
   color: #333;
 }
 
-.article-summary {
+.article-description {
   font-size: 14px;
   color: #666;
   margin-bottom: 12px;
@@ -133,5 +159,9 @@ const truncate = (text, maxLen) => {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.loading {
+  padding: 20px;
 }
 </style>
