@@ -51,10 +51,9 @@
                 <section class="videos">
                     <h1 class="section-title">视频课堂</h1>
                     <el-row :gutter="20">
-                        <el-col :span="6" v-for="(video, index) in videos" :key="index">
-                            <el-card :body-style="{ padding: '10px' }" shadow="hover">
-                                <iframe :src="video.url" frameborder="0" allowfullscreen
-                                    style="width: 100%; height: 200px; border-radius: 6px;"></iframe>
+                        <el-col :span="6" v-for="(video, index) in videos" :key="video.id">
+                            <el-card :body-style="{ padding: '10px' }" shadow="hover" class="video-card" @click="goToVideo(video.id)">
+                                <el-image :src="video.cover" fit="cover" style="height: 150px;"></el-image>
                                 <h3 style="margin: 10px 0;">{{ video.title }}</h3>
                             </el-card>
                         </el-col>
@@ -75,11 +74,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '@/components/Footer.vue'
 import { getArticleLatestService } from '@/api/article.js'
+import { getVideoLatestService } from '@/api/video.js'
 
 const activeIndex = ref('1')
 const isLoggedIn = ref(false)
 const router = useRouter()
 const articles = ref([])
+const videos = ref([])
 const loading = ref(true)
 
 const handleLogin = () => {
@@ -99,6 +100,16 @@ const getArticleLatest = async () => {
     } catch (error) {
         console.error('获取最新文章失败:', error)
         articles.value = []
+    }
+}
+const getVideoLatest = async () => {
+    try {
+        loading.value = true
+        const res = await getVideoLatestService(8)
+        videos.value = res.data || []
+    } catch (error) {
+        console.error('获取视频列表失败:', error)
+        videos.value = []
     } finally {
         loading.value = false
     }
@@ -106,23 +117,18 @@ const getArticleLatest = async () => {
 
 onMounted(() => {
     getArticleLatest()
+    getVideoLatest()
 })
-
-const videos = ref([
-    { title: '如何进行情绪自我疏导', url: 'https://www.youtube.com/embed/tgbNymZ7vqY' },
-    { title: '职场压力管理技巧', url: 'https://www.youtube.com/embed/tgbNymZ7vqY' },
-    { title: '亲子沟通的方法', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-    { title: '高效时间管理', url: 'https://www.youtube.com/embed/tgbNymZ7vqY' },
-    { title: '自尊与自我接纳', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-    { title: '沟通中的非暴力表达', url: 'https://www.youtube.com/embed/tgbNymZ7vqY' },
-    { title: '认识你的压力信号', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-    { title: '睡眠与心理健康', url: 'https://www.youtube.com/embed/tgbNymZ7vqY' }
-])
 
 
 const goToArticle = (id) => {
     router.push(`/article/${id}`)
 }
+
+const goToVideo = (id) => {
+    router.push(`/video/${id}`)
+}
+
 </script>
 
 <style scoped>
@@ -193,7 +199,14 @@ const goToArticle = (id) => {
     margin-bottom: 12px;
 }
 
-.loading {
-    padding: 20px;
+.video-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.video-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
+    transform: scale(1.03);
 }
 </style>

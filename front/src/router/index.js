@@ -7,6 +7,7 @@ import ExampleVue from '@/views/Example.vue'
 import ArticleVue from '@/views/Article.vue'
 import VideoVue from '@/views/Video.vue'
 import ArticleDetailVue from '@/views/ArticleDetail.vue'
+import VideoDetailVue from '@/views/VideoDetail.vue'
 
 
 // 定义路由
@@ -44,6 +45,11 @@ const routes = [
   {
     path:'/video',
     component: VideoVue
+  },
+  {
+    path: '/video/:id',
+    name: 'VideoDetail',
+    component: VideoDetailVue
   }
 
   // 可以添加更多路由
