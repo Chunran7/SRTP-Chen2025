@@ -1,8 +1,5 @@
 <template>
     <el-container class="article-detail-container">
-        <!-- 顶部导航栏 -->
-        <Navbar />
-
         <!-- 主体内容 -->
         <el-main class="main">
             <div class="main-container">
@@ -13,22 +10,9 @@
                         <span class="article-time">更新时间: {{ article.createTime }}</span>
                     </div>
                     <div class="article-content" v-html="renderedContent"></div>
-
-
-
-
-
-
-
-
                 </div>
                 <div v-else class="article-title">正在加载...</div>
-
-
-
-
             </div>
-
         </el-main>
 
         <!-- 页脚 -->
@@ -37,7 +21,6 @@
 </template>
 
 <script setup>
-import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

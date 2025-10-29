@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <Navbar />
     <router-view v-slot="{ Component, route }">
       <keep-alive>
         <component :is="Component" v-if="route.meta.keepAlive" :key="route.fullPath" />
@@ -9,10 +10,8 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App'
-}
+<script setup>
+import Navbar from '@/components/Navbar.vue'
 </script>
 
 <style>

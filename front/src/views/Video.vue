@@ -1,8 +1,6 @@
 <!-- src/views/Video.vue -->
 <template>
   <el-container class="video-container">
-    <Navbar />
-
     <el-main class="main">
       <div class="content">
         <h1 class="section-title">视频列表</h1>
@@ -38,7 +36,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import { getVideoListService } from '@/api/video.js'
 

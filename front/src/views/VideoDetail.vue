@@ -1,8 +1,5 @@
 <template>
     <el-container class="video-detail-container">
-        <!-- 顶部导航栏 -->
-        <Navbar />
-
         <!-- 主体内容 -->
         <el-main class="main">
             <div class="main-container">
@@ -28,7 +25,6 @@
 </template>
 
 <script setup>
-import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

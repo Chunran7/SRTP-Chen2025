@@ -1,7 +1,5 @@
 <template>
   <el-container class="article-container">
-    <Navbar />
-
     <el-main class="main">
       <div class="content">
         <h1 class="section-title">文章列表</h1>
@@ -39,7 +37,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getArticleListService } from '@/api/article.js'
-import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 
 const router = useRouter()

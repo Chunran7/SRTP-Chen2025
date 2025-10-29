@@ -1,8 +1,5 @@
 <template>
     <el-container class="home-container">
-        <!-- 顶部导航栏 -->
-        <Navbar />
-
         <!-- 主体内容 -->
         <el-main class="main">
             <!-- 走马灯 -->
@@ -69,7 +66,6 @@
 </template>
 
 <script setup>
-import Navbar from '@/components/Navbar.vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '@/components/Footer.vue'
