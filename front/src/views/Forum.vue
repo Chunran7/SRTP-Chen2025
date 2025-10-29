@@ -42,7 +42,8 @@
                         <p class="post-excerpt">{{ post.excerpt }}</p>
                     </div>
                     <div class="post-right">
-                        <div class="replies">{{ post.replies }}</div>
+                        <div class="replies">{{ post.replyCount }}</div>
+                        <div class="publish-time">{{ formatTime(post.createTime) }}</div>
                     </div>
                 </li>
             </ul>
@@ -120,6 +121,7 @@ const loadPosts = async () => {
             sortBy = 'create_time' // 按创建时间排序
         }
 
+        console.log('排序依据:', sortBy);
 
         const res = await getAllpostsService({
             page: 1,
@@ -171,6 +173,34 @@ const submitPost = () => {
 onMounted(() => {
     loadPosts()
 })
+
+// 格式化时间显示
+const formatTime = (time) => {
+    if (!time) return ''
+    const date = new Date(time)
+    const now = new Date()
+    const diff = now - date
+
+    // 如果是当天发布的，显示小时数
+    if (diff < 24 * 60 * 60 * 1000 && now.getDate() === date.getDate()) {
+        const hours = Math.floor(diff / (60 * 60 * 1000))
+        if (hours > 0) {
+            return `${hours}小时前`
+        } else {
+            const minutes = Math.floor(diff / (60 * 1000))
+            return `${minutes}分钟前`
+        }
+    }
+
+    // 如果是当年发布的，显示月日
+    if (now.getFullYear() === date.getFullYear()) {
+        return `${date.getMonth() + 1}-${date.getDate()}`
+    }
+
+    // 跨年的显示年月日
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -312,18 +342,26 @@ onMounted(() => {
 }
 
 .post-right {
-    width: 64px;
+    width: 90px;
     text-align: center;
     color: #6b7884
 }
 
+
 .post-right .replies {
     background: #e6f0ff;
     color: #007bff;
-    padding: 6px 8px;
+    padding: 6px 5px;
     border-radius: 14px;
-    font-weight: 600
+    font-weight: 600;
+    margin-bottom: 8px;
 }
+
+.post-right .publish-time {
+    color: #505050fe;
+    padding: 4px;
+}
+
 
 .forum-right {
     width: 240px;
