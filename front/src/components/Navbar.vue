@@ -1,13 +1,11 @@
 <!-- src/components/Navbar.vue -->
 <template>
   <el-header class="header" style="background-color: #ffffff; height: 60px">
-    <el-menu
-      mode="horizontal"
-      text-color="#000000"
-      active-text-color="#0040ff"
-      class="top-menu"
-      :default-active="activeIndex"
-    >
+    <div class="navbar-left">
+      <img :src="logo" alt="网站Logo" class="navbar-logo" @click="router.push('/home')">
+    </div>
+    <el-menu mode="horizontal" text-color="#000000" active-text-color="#0040ff" class="top-menu"
+      :default-active="activeIndex">
       <el-menu-item index="/home" @click="router.push('/home')">首页</el-menu-item>
       <el-menu-item index="/article" @click="router.push('/article')">文章</el-menu-item>
       <el-menu-item index="/video" @click="router.push('/video')">视频</el-menu-item>
@@ -23,6 +21,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
+import logo from '@/assets/logo.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -45,6 +44,20 @@ router.afterEach(() => {
 </script>
 
 <style scoped>
+.navbar-left {
+  float: left;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.navbar-logo {
+  height: 40px;
+  width: auto;
+  margin: 10px;
+}
+
 .navbar-right {
   position: absolute;
   right: 30px;

@@ -1,18 +1,19 @@
 <template>
     <div class="forum-page container">
         <aside class="forum-aside">
+            <div class="user-card" @click="goToProfile">
+                <div class="user-avatar">
+                    <img :src="currentUser.avatar || defaultAvatar" alt="avatar" />
+                </div>
+                <div class="user-info">
+                    <div class="user-nickname">{{ currentUser.nickname || '未登录' }}</div>
+                    <div class="user-action">点击编辑个人信息</div>
+                </div>
+            </div>
             <el-button class="btn-post" @click="openPostDialog">发布主题</el-button>
             <div class="aside-list">
                 <div class="aside-item active">
                     <span>全部主题</span>
-                </div>
-                <div class="aside-item">
-                    <i class="icon">📑</i>
-                    <span>丧痛支援</span>
-                </div>
-                <div class="aside-item">
-                    <i class="icon">📢</i>
-                    <span>官方消息</span>
                 </div>
             </div>
         </aside>
@@ -34,7 +35,7 @@
                     </div>
                     <div class="post-body">
                         <div class="post-header">
-                            <h3 class="post-title">
+                            <h3 class="post-title" @click="goToPostDetail(post.id)">
                                 {{ post.title }}
                             </h3>
 
@@ -85,8 +86,20 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getAllpostsService } from '@/api/post.js'
+import * as postService from '@/api/post.js'
 import defaultAvatar from '@/assets/default.png'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// 当前用户（从 localStorage 读取）
+const currentUser = ref({})
+
+const goToProfile = () => {
+    router.push('/profile/edit')
+}
+
+
 
 const postDialogVisible = ref(false)
 const sortType = ref('reply') // 默认按最新回复排序
@@ -106,6 +119,14 @@ const activeUsers = ref([
 ])
 
 const openPostDialog = () => {
+    // 只有在用户已登录时才直接打开发布对话框
+    const token = localStorage.getItem('token')
+    if (!token) {
+        ElMessage.warning('发布主题需要登录，请先登录')
+        router.push('/login')
+        return
+    }
+
     postDialogVisible.value = true
     postForm.title = ''
     postForm.content = ''
@@ -123,7 +144,7 @@ const loadPosts = async () => {
 
         console.log('排序依据:', sortBy);
 
-        const res = await getAllpostsService({
+        const res = await postService.getAllpostsService({
             page: 1,
             pageSize: 20,
             sortBy: sortBy,
@@ -148,30 +169,50 @@ const changeSort = (type) => {
 }
 
 const submitPost = () => {
+    // 再次检查登录状态，防止未登录提交
+    const token = localStorage.getItem('token')
+    if (!token) {
+        ElMessage.warning('发布主题需要登录，请先登录')
+        router.push('/login')
+        return
+    }
+
     if (!postForm.title || !postForm.content) {
         ElMessage.warning('请填写标题和内容')
         return
     }
 
-    // 添加新帖子到列表顶部
-    posts.value.unshift({
-        avatar: defaultAvatar,
+    const postPayload = {
         title: postForm.title,
-        content: postForm.content,
-        excerpt: postForm.content.length > 100
-            ? postForm.content.substring(0, 100) + '...'
-            : postForm.content,
-        replies: 0,
-    })
+        content: postForm.content
+    }
 
-    // 关闭对话框
-    postDialogVisible.value = false
-    ElMessage.success('发布成功')
+    postService.insertPostService(postPayload).then(() => {
+        loadPosts()
+        // 关闭对话框
+        postDialogVisible.value = false
+        ElMessage.success('发布成功')
+    }).catch((error) => {
+        console.error('发布帖子失败:', error)
+        ElMessage.error('发布帖子失败')
+    })
+}
+
+// 跳转到帖子详情页
+const goToPostDetail = (postId) => {
+    router.push(`/post/${postId}`)
 }
 
 // 组件挂载时加载数据
 onMounted(() => {
     loadPosts()
+    // 加载当前用户信息（如果有）
+    try {
+        const u = localStorage.getItem('user')
+        currentUser.value = u ? JSON.parse(u) : {}
+    } catch (e) {
+        currentUser.value = {}
+    }
 })
 
 // 格式化时间显示
@@ -214,6 +255,38 @@ const formatTime = (time) => {
 .forum-aside {
     width: 200px;
     background: transparent;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.user-card:hover {
+    transform: translateY(-2px)
+}
+
+.user-avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover
+}
+
+.user-nickname {
+    font-weight: 700
+}
+
+.user-action {
+    font-size: 12px;
+    color: #6b7884
 }
 
 .btn-post {
@@ -328,7 +401,13 @@ const formatTime = (time) => {
     margin: 0;
     font-size: 16px;
     color: #233642;
-    font-weight: 600
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.post-title:hover {
+    color: #007bff;
+    text-decoration: underline;
 }
 
 .post-excerpt {

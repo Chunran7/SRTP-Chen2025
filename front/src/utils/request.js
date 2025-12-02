@@ -6,6 +6,19 @@ import axios from 'axios';
 const baseURL = '/api';
 const instance = axios.create({baseURL})
 
+// 添加请求拦截器：自动在请求头中加入 Authorization: Bearer <token>
+instance.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            config.headers = config.headers || {}
+            config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
+    },
+    (error) => Promise.reject(error)
+)
+
 
 //添加响应拦截器
 instance.interceptors.response.use(

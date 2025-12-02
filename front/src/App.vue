@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Navbar />
+    <Navbar v-if="route.path !== '/login' && !route.path.startsWith('/admin')" />
     <router-view v-slot="{ Component, route }">
       <keep-alive>
         <component :is="Component" v-if="route.meta.keepAlive" :key="route.fullPath" />
@@ -12,6 +12,9 @@
 
 <script setup>
 import Navbar from '@/components/Navbar.vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 </script>
 
 <style>

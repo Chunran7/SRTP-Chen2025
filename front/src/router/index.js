@@ -8,6 +8,9 @@ import VideoVue from "@/views/Video.vue";
 import ArticleDetailVue from "@/views/ArticleDetail.vue";
 import VideoDetailVue from "@/views/VideoDetail.vue";
 import ForumVue from "@/views/Forum.vue";
+import PostDetailVue from "@/views/PostDetail.vue";
+import ProfileVue from "@/views/Profile.vue";
+import AdminVue from "@/views/Admin.vue";
 
 // 定义路由
 const routes = [
@@ -22,12 +25,8 @@ const routes = [
   },
   {
     path: "/",
-    redirect: "/home", // 重定向到首页
+    redirect: "/home",
   },
-  //   {
-  //   path: '/example',
-  //   component: ExampleVue
-  // },
   {
     path: "/article",
     name: "Article",
@@ -51,12 +50,54 @@ const routes = [
     component: VideoDetailVue,
   },
   {
+    path: "/admin",
+    name: "Admin",
+    component: AdminVue,
+    meta: { requiresAuth: false },
+  },
+  {
     path: "/forum",
     name: "forum",
     component: ForumVue,
+    // 允许匿名访问帖子列表，发布主题时在组件内部检查登录状态
     meta: {
-      requiresAuth: true // 添加需要认证的元信息
-    }
+      requiresAuth: false,
+    },
+  },
+  {
+    path: "/profile/edit",
+    name: "ProfileEdit",
+    component: ProfileVue,
+    meta: {
+      requiresAuth: false,
+    },
+  },
+  {
+    path: "/article",
+    name: "Article",
+    component: ArticleVue,
+    meta: {
+      keepAlive: true, // 需要被缓存
+    },
+  },
+  {
+    path: "/article/:id",
+    name: "ArticleDetail",
+    component: ArticleDetailVue,
+  },
+  {
+    path: "/video",
+    component: VideoVue,
+  },
+  {
+    path: "/video/:id",
+    name: "VideoDetail",
+    component: VideoDetailVue,
+  },
+  {
+    path: "/post/:id",
+    name: "PostDetail",
+    component: PostDetailVue,
   },
 
   // 可以添加更多路由
@@ -78,13 +119,14 @@ router.beforeEach((to, from, next) => {
   // 检查要去的路由是否需要认证
   if (to.meta.requiresAuth) {
     // 检查是否有token
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       // 有token，允许访问
       next();
     } else {
       // 没有token，重定向到登录页
-      next('/login');
+      alert("访问该模块前，请先登录");
+      next("/login");
     }
   } else {
     // 不需要认证的路由，直接访问

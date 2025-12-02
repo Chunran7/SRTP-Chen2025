@@ -7,3 +7,9 @@ export const getAllpostsService = ({ page, pageSize, sortBy, order } = {}) => {
     params: { page, pageSize, sortBy, order },
   });
 };
+
+//插入帖子接口
+
+export const insertPostService = (post) => {
+  return request.post("/post", post);
+};
