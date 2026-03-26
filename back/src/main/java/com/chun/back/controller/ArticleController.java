@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -73,5 +74,23 @@ public class ArticleController {
             return Result.success(articles);
         }
 
+    }
+    
+    @DeleteMapping("/{id}")
+    public Result deleteArticle(@PathVariable Long id, HttpServletRequest request) {
+        // 从 request 中获取 claims 信息（由拦截器设置）
+        Map<String, Object> claims = (Map<String, Object>) request.getAttribute("claims");
+
+        // 验证是否为管理员登录（检查 claims 中是否包含管理员信息）
+        if (claims == null || !claims.containsKey("username")) {
+            return Result.error("未授权访问");
+        }
+
+        int rows = articleService.deleteArticle(id);
+        if (rows > 0) {
+            return Result.success("删除成功");
+        } else {
+            return Result.error("删除失败");
+        }
     }
 }

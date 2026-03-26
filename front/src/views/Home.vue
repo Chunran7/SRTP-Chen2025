@@ -44,19 +44,6 @@
                     </el-row>
                 </section>
 
-                <!-- 视频课堂模块 -->
-                <section class="videos">
-                    <h1 class="section-title">视频课堂</h1>
-                    <el-row :gutter="20">
-                        <el-col :span="6" v-for="(video, index) in videos" :key="video.id">
-                            <el-card :body-style="{ padding: '10px' }" shadow="hover" class="video-card" @click="goToVideo(video.id)">
-                                <el-image :src="video.cover" fit="cover" style="height: 150px;"></el-image>
-                                <h3 style="margin: 10px 0;">{{ video.title }}</h3>
-                            </el-card>
-                        </el-col>
-                    </el-row>
-
-                </section>
             </div>
         </el-main>
 
@@ -70,13 +57,11 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '@/components/Footer.vue'
 import { getArticleLatestService } from '@/api/article.js'
-import { getVideoLatestService } from '@/api/video.js'
 
 const activeIndex = ref('1')
 const isLoggedIn = ref(false)
 const router = useRouter()
 const articles = ref([])
-const videos = ref([])
 const loading = ref(true)
 
 const handleLogin = () => {
@@ -96,16 +81,6 @@ const getArticleLatest = async () => {
     } catch (error) {
         console.error('获取最新文章失败:', error)
         articles.value = []
-    }
-}
-const getVideoLatest = async () => {
-    try {
-        loading.value = true
-        const res = await getVideoLatestService(8)
-        videos.value = res.data || []
-    } catch (error) {
-        console.error('获取视频列表失败:', error)
-        videos.value = []
     } finally {
         loading.value = false
     }
@@ -113,16 +88,11 @@ const getVideoLatest = async () => {
 
 onMounted(() => {
     getArticleLatest()
-    getVideoLatest()
 })
 
 
 const goToArticle = (id) => {
     router.push(`/article/${id}`)
-}
-
-const goToVideo = (id) => {
-    router.push(`/video/${id}`)
 }
 
 </script>
@@ -163,46 +133,4 @@ const goToVideo = (id) => {
     padding-bottom: 10px;
 }
 
-.article-card {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin: 20px 0;
-}
-
-.article-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
-    transform: scale(1.03);
-}
-
-.article-img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-.article-title {
-    margin: 0 0 8px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-}
-
-.article-description {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 12px;
-}
-
-.video-card {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-}
-
-.video-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
-    transform: scale(1.03);
-}
 </style>

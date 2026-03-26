@@ -4,11 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginVue from "@/views/Login.vue";
 import HomeVue from "@/views/Home.vue";
 import ArticleVue from "@/views/Article.vue";
-import VideoVue from "@/views/Video.vue";
 import ArticleDetailVue from "@/views/ArticleDetail.vue";
-import VideoDetailVue from "@/views/VideoDetail.vue";
-import ForumVue from "@/views/Forum.vue";
-import PostDetailVue from "@/views/PostDetail.vue";
 import ProfileVue from "@/views/Profile.vue";
 import AdminVue from "@/views/Admin.vue";
 
@@ -41,28 +37,10 @@ const routes = [
     component: ArticleDetailVue,
   },
   {
-    path: "/video",
-    component: VideoVue,
-  },
-  {
-    path: "/video/:id",
-    name: "VideoDetail",
-    component: VideoDetailVue,
-  },
-  {
     path: "/admin",
     name: "Admin",
     component: AdminVue,
     meta: { requiresAuth: false },
-  },
-  {
-    path: "/forum",
-    name: "forum",
-    component: ForumVue,
-    // 允许匿名访问帖子列表，发布主题时在组件内部检查登录状态
-    meta: {
-      requiresAuth: false,
-    },
   },
   {
     path: "/profile/edit",
@@ -71,33 +49,6 @@ const routes = [
     meta: {
       requiresAuth: false,
     },
-  },
-  {
-    path: "/article",
-    name: "Article",
-    component: ArticleVue,
-    meta: {
-      keepAlive: true, // 需要被缓存
-    },
-  },
-  {
-    path: "/article/:id",
-    name: "ArticleDetail",
-    component: ArticleDetailVue,
-  },
-  {
-    path: "/video",
-    component: VideoVue,
-  },
-  {
-    path: "/video/:id",
-    name: "VideoDetail",
-    component: VideoDetailVue,
-  },
-  {
-    path: "/post/:id",
-    name: "PostDetail",
-    component: PostDetailVue,
   },
 
   // 可以添加更多路由
@@ -118,13 +69,13 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // 检查要去的路由是否需要认证
   if (to.meta.requiresAuth) {
-    // 检查是否有token
+    // 检查是否有 token
     const token = localStorage.getItem("token");
     if (token) {
-      // 有token，允许访问
+      // 有 token，允许访问
       next();
     } else {
-      // 没有token，重定向到登录页
+      // 没有 token，重定向到登录页
       alert("访问该模块前，请先登录");
       next("/login");
     }

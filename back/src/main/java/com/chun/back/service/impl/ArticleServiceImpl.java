@@ -34,4 +34,35 @@ public class ArticleServiceImpl implements ArticleService {
         return articleMapper.insertArticle(article);
     }
 
+    @Override
+    public int deleteArticle(Long id) {
+        return articleMapper.deleteArticle(id);
+    }
+
+    @Override
+    public int softDeleteArticle(Long id) {
+        return articleMapper.softDeleteArticle(id);
+    }
+
+    @Override
+    public int restoreArticle(Long id) {
+        return articleMapper.restoreArticle(id);
+    }
+
+    @Override
+    public int hardDeleteArticle(Long id) {
+        return articleMapper.hardDeleteArticle(id);
+    }
+
+    @Override
+    public List<Article> getArticleListByPage(Integer page, Integer pageSize, String keyword, Integer includeDeleted) {
+        int offset = (page - 1) * pageSize;
+        return articleMapper.getArticleListByPage(page, pageSize, keyword, includeDeleted, offset);
+    }
+
+    @Override
+    public Long countArticles(String keyword, Integer includeDeleted) {
+        return articleMapper.countArticles(keyword, includeDeleted);
+    }
+
 }

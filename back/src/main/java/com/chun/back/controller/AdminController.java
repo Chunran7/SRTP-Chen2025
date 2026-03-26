@@ -1,17 +1,17 @@
 package com.chun.back.controller;
 
 import com.chun.back.pojo.Admin;
+import com.chun.back.pojo.Article;
 import com.chun.back.pojo.Result;
 import com.chun.back.service.AdminService;
+import com.chun.back.service.ArticleService;
 import com.chun.back.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,6 +20,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private ArticleService articleService;
 
     /**
      * 管理员登录接口
@@ -64,5 +67,77 @@ public class AdminController {
         data.put("adminInfo", loginAdmin);
         
         return Result.success(data);
+    }
+
+    /**
+     * 管理员获取文章列表（支持分页、搜索、包含已删除）
+     */
+    @GetMapping("/article/list")
+    public Result getArticleList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") Integer includeDeleted) {
+        
+        List<Article> articles = articleService.getArticleListByPage(page, pageSize, keyword, includeDeleted);
+        Long total = articleService.countArticles(keyword, includeDeleted);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", articles);
+        response.put("total", total);
+        
+        return Result.success(response);
+    }
+
+    /**
+     * 管理员根据 ID 获取文章详情
+     */
+    @GetMapping("/article/{id}")
+    public Result getArticleById(@PathVariable Long id) {
+        Article article = articleService.getArticleById(id);
+        if (article != null) {
+            return Result.success(article);
+        } else {
+            return Result.error("未找到文章");
+        }
+    }
+
+    /**
+     * 管理员软删除文章
+     */
+    @DeleteMapping("/article/{id}/soft")
+    public Result softDeleteArticle(@PathVariable Long id) {
+        int rows = articleService.softDeleteArticle(id);
+        if (rows > 0) {
+            return Result.success("删除成功");
+        } else {
+            return Result.error("删除失败");
+        }
+    }
+
+    /**
+     * 管理员恢复已删除的文章
+     */
+    @PutMapping("/article/{id}/restore")
+    public Result restoreArticle(@PathVariable Long id) {
+        int rows = articleService.restoreArticle(id);
+        if (rows > 0) {
+            return Result.success("恢复成功");
+        } else {
+            return Result.error("恢复失败");
+        }
+    }
+
+    /**
+     * 管理员彻底删除文章（硬删除）
+     */
+    @DeleteMapping("/article/{id}/hard")
+    public Result hardDeleteArticle(@PathVariable Long id) {
+        int rows = articleService.hardDeleteArticle(id);
+        if (rows > 0) {
+            return Result.success("彻底删除成功");
+        } else {
+            return Result.error("删除失败");
+        }
     }
 }
