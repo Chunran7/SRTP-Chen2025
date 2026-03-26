@@ -98,6 +98,7 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request.js'
+import { adminLoginService } from '@/api/admin.js'
 
 const formRef = ref(null)
 const loading = ref(false)
@@ -110,14 +111,14 @@ const form = ref({
 })
 
 // 登录状态和表单
-const isLoggedIn = ref(sessionStorage.getItem('admin_logged_in') === 'true')
+const isLoggedIn = ref(sessionStorage.getItem('admin_logged_in') === 'true' && localStorage.getItem('token'))
 const loginForm = ref({ username: '', password: '' })
 const activeMenu = ref('publish')
 
 const handleSubmit = async () => {
     try {
         loading.value = true
-        // 调用后端API
+        // 调用后端 API
         const res = await request.post('/article', form.value)
         ElMessage.success(res || '发布成功')
         // 重置表单
@@ -146,23 +147,47 @@ const handleVideoSubmit = async () => {
     }
 }
 
-const handleLogin = () => {
+const handleLogin = async () => {
     loading.value = true
-    // 前端本地校验账号密码
-    const { username, password } = loginForm.value
-    if (username === 'seu666' && password === 'yilutongxing') {
+    try {
+        // 调用后端登录接口
+        const { username, password } = loginForm.value
+        
+        // 先检查前端是否为空
+        if (!username) {
+            ElMessage.error('请输入用户名')
+            loading.value = false
+            return
+        }
+        if (!password) {
+            ElMessage.error('请输入密码')
+            loading.value = false
+            return
+        }
+        
+        // 调用后端登录 API
+        const result = await adminLoginService(loginForm.value)
+        
+        // 登录成功，保存 token 和管理员信息到 localStorage（因为 request.js 从 localStorage 读取）
+        localStorage.setItem('token', result.data.token)
+        localStorage.setItem('adminInfo', JSON.stringify(result.data.adminInfo))
         sessionStorage.setItem('admin_logged_in', 'true')
+        
         isLoggedIn.value = true
         ElMessage.success('登录成功')
-    } else {
-        ElMessage.error('用户名或密码错误')
+    } catch (err) {
+        console.error(err)
+        ElMessage.error(err.msg || err.message || '登录失败')
+    } finally {
+        loading.value = false
     }
-    loading.value = false
 }
 
 const handleMenuSelect = (key) => {
     if (key === 'logout') {
         sessionStorage.removeItem('admin_logged_in')
+        localStorage.removeItem('token')
+        localStorage.removeItem('adminInfo')
         isLoggedIn.value = false
         ElMessage.info('已退出')
     } else {

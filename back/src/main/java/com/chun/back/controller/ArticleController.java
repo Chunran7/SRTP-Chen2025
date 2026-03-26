@@ -1,6 +1,7 @@
 package com.chun.back.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-// ...existing imports...
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/article")
@@ -36,12 +37,15 @@ public class ArticleController {
     }
 
     @PostMapping("")
-    public Result createArticle(@RequestBody Article article) {
-        // 简单填充时间
-        java.sql.Date now = new java.sql.Date(System.currentTimeMillis());
-        if (article.getCreateTime() == null)
-            article.setCreateTime(now);
-        article.setUpdateTime(now);
+    public Result createArticle(@RequestBody Article article, HttpServletRequest request) {
+        // 从 request 中获取 claims 信息（由拦截器设置）
+        Map<String, Object> claims = (Map<String, Object>) request.getAttribute("claims");
+
+        // 验证是否为管理员登录（检查 claims 中是否包含管理员信息）
+        if (claims == null || !claims.containsKey("username")) {
+            return Result.error("未授权访问");
+        }
+
         int rows = articleService.insertArticle(article);
         if (rows > 0) {
             return Result.success("添加成功");
