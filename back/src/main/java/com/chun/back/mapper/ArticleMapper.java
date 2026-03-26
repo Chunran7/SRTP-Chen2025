@@ -23,7 +23,7 @@ public interface ArticleMapper {
     List<Article> getLatestArticleList(Integer count);
 
     // 插入文章，返回受影响行数
-    @Insert("INSERT INTO article(title, first_picture, description, content, author, create_time, update_time, views, likes) VALUES(#{title}, #{firstPicture}, #{description}, #{content}, #{author}, #{createTime}, #{updateTime}, #{views}, #{likes})")
+    @Insert("INSERT INTO article(title, first_picture, description, content, author, create_time, update_time, views, likes, is_deleted) VALUES(#{title}, #{firstPicture}, #{description}, #{content}, #{author}, NOW(), NOW(), 0, 0, 0)")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     int insertArticle(Article article);
     
@@ -47,13 +47,13 @@ public interface ArticleMapper {
     @Select("<script>" +
             "SELECT * FROM article " +
             "<where>" +
-            "<if test='keyword != null and keyword != \"\">"+
+            "<if test=\"keyword != null and keyword != ''\">" +
             "AND (title LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))" +
             "</if>" +
-            "<if test='includeDeleted == 0'> " +
-            "AND is_deleted = 0 " +
+            "<if test=\"includeDeleted == 0\">" +
+            "AND is_deleted = 0" +
             "</if>" +
-            "</where>" +
+            "</where> " +
             "ORDER BY create_time DESC " +
             "LIMIT #{offset}, #{pageSize}" +
             "</script>")
@@ -67,11 +67,11 @@ public interface ArticleMapper {
     @Select("<script>" +
             "SELECT COUNT(*) FROM article " +
             "<where>" +
-            "<if test='keyword != null and keyword != \"\">"+
+            "<if test=\"keyword != null and keyword != ''\">" +
             "AND (title LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))" +
             "</if>" +
-            "<if test='includeDeleted == 0'> " +
-            "AND is_deleted = 0 " +
+            "<if test=\"includeDeleted == 0\">" +
+            "AND is_deleted = 0" +
             "</if>" +
             "</where>" +
             "</script>")

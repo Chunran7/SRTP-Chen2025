@@ -9,7 +9,8 @@ const instance = axios.create({baseURL})
 // 添加请求拦截器：自动在请求头中加入 Authorization: Bearer <token>
 instance.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token')
+        // 优先使用 admin_token（管理员），如果没有则使用 token（普通用户）
+        const token = localStorage.getItem('admin_token') || localStorage.getItem('token')
         if (token) {
             config.headers = config.headers || {}
             config.headers.Authorization = `Bearer ${token}`

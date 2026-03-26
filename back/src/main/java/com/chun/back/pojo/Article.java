@@ -15,4 +15,5 @@ public class Article {
     private Date updateTime;
     private Integer views;
     private Integer likes;
+    private Integer isDeleted;
 }

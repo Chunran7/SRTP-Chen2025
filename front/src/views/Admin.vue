@@ -218,10 +218,11 @@ import {
 } from '@/api/admin.js'
 
 // ================= 状态定义 =================
-const isLoggedIn = ref(
-    sessionStorage.getItem('admin_logged_in') === 'true' &&
-    !!localStorage.getItem('admin_token')
-)
+const isLoggedIn = ref(false)
+// const isLoggedIn = ref(
+//     sessionStorage.getItem('admin_logged_in') === 'true' &&
+//     !!localStorage.getItem('admin_token')
+// )
 
 const loading = ref(false)
 const activeMenu = ref('dashboard')
@@ -303,11 +304,15 @@ const onAdminLogout = () => {
 const handleLogin = async () => {
     loading.value = true
     try {
-        const token = await request.post('/admin/login', {
+        const res = await request.post('/admin/login', {
             username: loginForm.username,
             password: loginForm.password
         })
-
+        
+        // res 的结构是 { code: 0, message: 'success', data: { token: '...', adminInfo: {...} } }
+        // 从 res.data 中获取 token
+        const token = res.data.token
+        
         localStorage.setItem('admin_token', token)
         sessionStorage.setItem('admin_logged_in', 'true')
         isLoggedIn.value = true
@@ -799,4 +804,10 @@ onUnmounted(() => {
     margin-top: 10px;
 }
 </style>
+
+
+
+
+
+
 
