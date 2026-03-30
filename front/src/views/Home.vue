@@ -12,15 +12,15 @@
             <div class="content">
                 <!-- 介绍我们 -->
                 <section class="introduction">
-                    <h1 class="section-title">介绍我们</h1>
+                    <h1 class="section-title">{{ introduction.title }}</h1>
                     <el-row gutter="40">
                         <el-col :span="12">
-                            <img src="/images/introduction.png" alt="图片描述"
+                            <img :src="introduction.imageUrl || '/images/introduction.png'" alt="图片描述"
                                 style="width: 100%; height: auto; border-radius: 6px;" />
                         </el-col>
                         <el-col :span="12">
                             <p>
-                                介绍我们的基本内容
+                                {{ introduction.content }}
                             </p>
                         </el-col>
                     </el-row>
@@ -57,12 +57,18 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '@/components/Footer.vue'
 import { getArticleLatestService } from '@/api/article.js'
+import { getIntroductionService } from '@/api/admin.js'
 
 const activeIndex = ref('1')
 const isLoggedIn = ref(false)
 const router = useRouter()
 const articles = ref([])
 const loading = ref(true)
+const introduction = ref({
+    title: '介绍我们',
+    content: '介绍我们的基本内容',
+    imageUrl: '/images/introduction.png'
+})
 
 const handleLogin = () => {
     router.push('/login')
@@ -88,8 +94,17 @@ const getArticleLatest = async () => {
 
 onMounted(() => {
     getArticleLatest()
+    getIntroduction()
 })
 
+const getIntroduction = async () => {
+    try {
+        const res = await getIntroductionService()
+        introduction.value = res
+    } catch (error) {
+        console.error('获取介绍信息失败:', error)
+    }
+}
 
 const goToArticle = (id) => {
     router.push(`/article/${id}`)

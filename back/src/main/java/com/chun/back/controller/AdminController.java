@@ -2,9 +2,11 @@ package com.chun.back.controller;
 
 import com.chun.back.pojo.Admin;
 import com.chun.back.pojo.Article;
+import com.chun.back.pojo.Introduction;
 import com.chun.back.pojo.Result;
 import com.chun.back.service.AdminService;
 import com.chun.back.service.ArticleService;
+import com.chun.back.service.IntroductionService;
 import com.chun.back.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -23,6 +25,9 @@ public class AdminController {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private IntroductionService introductionService;
 
     /**
      * 管理员登录接口
@@ -138,6 +143,41 @@ public class AdminController {
             return Result.success("彻底删除成功");
         } else {
             return Result.error("删除失败");
+        }
+    }
+
+    /**
+     * 获取介绍信息
+     */
+    @GetMapping("/introduction")
+    public Result getIntroduction() {
+        Introduction introduction = introductionService.getIntroduction();
+        if (introduction != null) {
+            return Result.success(introduction);
+        } else {
+            return Result.error("未找到介绍信息");
+        }
+    }
+
+    /**
+     * 更新介绍信息
+     */
+    @PutMapping("/introduction")
+    public Result updateIntroduction(@RequestBody Map<String, String> body) {
+        try {
+            Introduction introduction = new Introduction();
+            introduction.setTitle(body.get("title"));
+            introduction.setContent(body.get("content"));
+            introduction.setImageUrl(body.get("imageUrl"));
+            
+            int rows = introductionService.updateIntroduction(introduction);
+            if (rows > 0) {
+                return Result.success("更新成功");
+            } else {
+                return Result.error("更新失败");
+            }
+        } catch (Exception e) {
+            return Result.error("更新失败：" + e.getMessage());
         }
     }
 }

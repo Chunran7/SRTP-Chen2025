@@ -75,6 +75,13 @@
                         <span>文章管理</span>
                     </el-menu-item>
 
+                    <el-menu-item index="introduction_mgr">
+                        <el-icon>
+                            <Edit />
+                        </el-icon>
+                        <span>介绍信息管理</span>
+                    </el-menu-item>
+
                     <el-menu-item index="logout">
                         <el-icon>
                             <SwitchButton />
@@ -198,6 +205,34 @@
                             </div>
                         </el-card>
                     </div>
+
+                    <!-- 介绍信息管理 -->
+                    <div v-if="activeMenu === 'introduction_mgr'">
+                        <el-card>
+                            <template #header>介绍信息管理</template>
+                            <el-form :model="introductionForm" label-width="100px">
+                                <el-form-item label="标题">
+                                    <el-input v-model="introductionForm.title" placeholder="请输入标题" />
+                                </el-form-item>
+                                <el-form-item label="图片 URL">
+                                    <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL" />
+                                </el-form-item>
+                                <el-form-item label="介绍内容">
+                                    <el-input 
+                                        v-model="introductionForm.content" 
+                                        type="textarea" 
+                                        rows="10" 
+                                        placeholder="请输入介绍内容"
+                                    />
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="handleIntroductionSubmit" :loading="loading">
+                                        保存修改
+                                    </el-button>
+                                </el-form-item>
+                            </el-form>
+                        </el-card>
+                    </div>
                 </el-main>
             </el-container>
         </el-container>
@@ -207,14 +242,16 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User, Lock, Odometer, Document, Setting, SwitchButton } from '@element-plus/icons-vue'
+import { User, Lock, Odometer, Document, Setting, SwitchButton, Edit } from '@element-plus/icons-vue'
 import request from '@/utils/request.js'
 import {
     adminGetArticleList,
     adminGetArticleById,
     adminSoftDeleteArticle,
     adminRestoreArticle,
-    adminHardDeleteArticle
+    adminHardDeleteArticle,
+    getIntroductionService,
+    updateIntroductionService
 } from '@/api/admin.js'
 
 // ================= 状态定义 =================
@@ -234,6 +271,13 @@ const stats = ref({ userCount: 0, articleCount: 0 })
 const articleQuery = reactive({ page: 1, pageSize: 10, keyword: '', includeDeleted: false })
 const adminArticles = ref([])
 const adminTotal = ref(0)
+
+// 介绍信息相关
+const introductionForm = reactive({
+    title: '',
+    content: '',
+    imageUrl: ''
+})
 
 const fetchAdminArticles = async () => {
     try {
@@ -357,6 +401,7 @@ const handleMenuSelect = (index) => {
         activeMenu.value = index
         if (index === 'dashboard') fetchStats()
         if (index === 'article_mgr') fetchAdminArticles()
+        if (index === 'introduction_mgr') fetchIntroduction()
     }
 }
 
@@ -364,7 +409,8 @@ const getMenuName = (key) => {
     const map = {
         dashboard: '数据看板',
         publish: '发布文章',
-        article_mgr: '文章管理'
+        article_mgr: '文章管理',
+        introduction_mgr: '介绍信息管理'
     }
     return map[key] || '后台首页'
 }
@@ -379,6 +425,17 @@ const fetchStats = async () => {
         }
     } catch (e) {
         // 401 会被 request.js 统一处理并触发 admin-logout
+    }
+}
+
+const fetchIntroduction = async () => {
+    try {
+        const data = await getIntroductionService()
+        introductionForm.title = data.title
+        introductionForm.content = data.content
+        introductionForm.imageUrl = data.imageUrl
+    } catch (e) {
+        ElMessage.error(e?.message || '获取介绍信息失败')
     }
 }
 
@@ -419,6 +476,18 @@ const handleVideoSubmit = async () => {
         }
     } catch (e) {
         ElMessage.error(e?.message || '上传失败')
+    } finally {
+        loading.value = false
+    }
+}
+
+const handleIntroductionSubmit = async () => {
+    loading.value = true
+    try {
+        await updateIntroductionService(introductionForm)
+        ElMessage.success('保存成功')
+    } catch (e) {
+        ElMessage.error(e?.message || '保存失败')
     } finally {
         loading.value = false
     }
@@ -804,6 +873,18 @@ onUnmounted(() => {
     margin-top: 10px;
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

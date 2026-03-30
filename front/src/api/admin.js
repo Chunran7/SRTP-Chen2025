@@ -81,3 +81,20 @@ export const adminRestoreArticle = (id) => {
 export const adminHardDeleteArticle = (id) => {
     return request.delete(`/admin/article/${id}/hard`);
 }
+
+/**
+ * 获取介绍信息
+ * @returns {Promise} 返回 Promise 对象
+ */
+export const getIntroductionService = () => {
+    return request.get('/admin/introduction');
+}
+
+/**
+ * 更新介绍信息
+ * @param {Object} introData - 介绍信息数据，包含 title、content、imageUrl
+ * @returns {Promise} 返回 Promise 对象
+ */
+export const updateIntroductionService = (introData) => {
+    return request.put('/admin/introduction', introData);
+}
