@@ -171,7 +171,7 @@
                                 <el-table-column prop="title" label="标题" />
                                 <el-table-column prop="author" label="作者" width="140" />
                                 <el-table-column prop="views" label="浏览" width="100" />
-                                <el-table-column prop="likeCount" label="点赞" width="100" />
+                                <el-table-column prop="likes" label="点赞" width="100" />
                                 <el-table-column label="状态" width="120">
                                     <template #default="{ row }">
                                         <el-tag :type="row.isDeleted === 1 ? 'danger' : 'success'">
@@ -218,12 +218,8 @@
                                     <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL" />
                                 </el-form-item>
                                 <el-form-item label="介绍内容">
-                                    <el-input 
-                                        v-model="introductionForm.content" 
-                                        type="textarea" 
-                                        rows="10" 
-                                        placeholder="请输入介绍内容"
-                                    />
+                                    <el-input v-model="introductionForm.content" type="textarea" rows="10"
+                                        placeholder="请输入介绍内容" />
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="handleIntroductionSubmit" :loading="loading">
@@ -281,16 +277,30 @@ const introductionForm = reactive({
 
 const fetchAdminArticles = async () => {
     try {
+        console.log('开始获取文章列表，参数:', articleQuery)
         const res = await adminGetArticleList({
             page: articleQuery.page,
             pageSize: articleQuery.pageSize,
             keyword: articleQuery.keyword,
             includeDeleted: articleQuery.includeDeleted ? 1 : 0
         })
-        adminArticles.value = Array.isArray(res) ? res : []
-        adminTotal.value = adminArticles.value.length
+        console.log('后端返回的数据:', res)
+        // 从控制台输出可以看到，res 仍然包含 {code, msg, data}
+        // 说明拦截器的返回值没有被正确解包，我们需要手动访问 res.data
+        if (res && res.data && res.data.list) {
+            adminArticles.value = Array.isArray(res.data.list) ? res.data.list : []
+            adminTotal.value = res.data.total || 0
+            console.log('解析后的文章列表:', adminArticles.value, '总数:', adminTotal.value)
+        } else {
+            console.warn('返回数据格式异常，res:', res)
+            adminArticles.value = []
+            adminTotal.value = 0
+        }
     } catch (e) {
+        console.error('获取文章列表失败:', e)
         ElMessage.error(e?.message || '获取文章列表失败')
+        adminArticles.value = []
+        adminTotal.value = 0
     }
 }
 
@@ -352,11 +362,11 @@ const handleLogin = async () => {
             username: loginForm.username,
             password: loginForm.password
         })
-        
+
         // res 的结构是 { code: 0, message: 'success', data: { token: '...', adminInfo: {...} } }
         // 从 res.data 中获取 token
         const token = res.data.token
-        
+
         localStorage.setItem('admin_token', token)
         sessionStorage.setItem('admin_logged_in', 'true')
         isLoggedIn.value = true
@@ -462,24 +472,6 @@ const handleArticleSubmit = async () => {
     }
 }
 
-const handleVideoSubmit = async () => {
-    loading.value = true
-    try {
-        await request.post('/video', videoForm.value)
-        ElMessage.success('上传成功')
-        videoForm.value = {
-            title: '',
-            url: '',
-            cover: '',
-            description: '',
-            author: '管理员'
-        }
-    } catch (e) {
-        ElMessage.error(e?.message || '上传失败')
-    } finally {
-        loading.value = false
-    }
-}
 
 const handleIntroductionSubmit = async () => {
     loading.value = true
@@ -493,21 +485,6 @@ const handleIntroductionSubmit = async () => {
     }
 }
 
-// 6. 用户封禁
-const toggleUserStatus = async (user) => {
-    const newStatus = user.status === 1 ? 0 : 1
-    const actionText = newStatus === 1 ? '解封' : '封禁'
-    try {
-        await ElMessageBox.confirm(
-            `确定要${actionText}用户 ${user.username} 吗？`,
-            '警告',
-            { type: 'warning' }
-        )
-        await request.put(`/admin/users/${user.id}/status?status=${newStatus}`)
-        user.status = newStatus
-        ElMessage.success(`已${actionText}`)
-    } catch (e) { }
-}
 
 onMounted(() => {
     window.addEventListener('admin-logout', onAdminLogout)
@@ -873,22 +850,3 @@ onUnmounted(() => {
     margin-top: 10px;
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
