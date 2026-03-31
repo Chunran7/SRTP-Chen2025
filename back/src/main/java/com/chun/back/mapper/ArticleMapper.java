@@ -16,10 +16,10 @@ public interface ArticleMapper {
     @Select("SELECT * FROM article WHERE id = #{id}")
     Article getArticleById(Long id);
 
-    @Select("SELECT * FROM article")
+    @Select("SELECT * FROM article WHERE is_deleted = 0")
     List<Article> getArticleList();
 
-    @Select("SELECT * FROM article ORDER BY create_time DESC LIMIT #{count}")
+    @Select("SELECT * FROM article WHERE is_deleted = 0 ORDER BY create_time DESC LIMIT #{count}")
     List<Article> getLatestArticleList(Integer count);
 
     // 插入文章，返回受影响行数

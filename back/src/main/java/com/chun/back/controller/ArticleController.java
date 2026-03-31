@@ -30,10 +30,11 @@ public class ArticleController {
     @GetMapping("/{id}")
     public Result getArticleById(@PathVariable Long id) {
         Article article = articleService.getArticleById(id);
-        if (article != null) {
-            return Result.success(article);
+        // 如果文章不存在或已被删除，返回错误信息
+        if (article == null || article.getIsDeleted() == 1) {
+            return Result.error("文章不存在或已被删除");
         } else {
-            return Result.error("未找到文章");
+            return Result.success(article);
         }
     }
 
