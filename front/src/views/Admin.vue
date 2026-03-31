@@ -137,7 +137,7 @@
                                     <el-input type="textarea" v-model="articleForm.description" />
                                 </el-form-item>
                                 <el-form-item label="正文">
-                                    <el-input type="textarea" v-model="articleForm.content" rows="10" />
+                                    <md-editor v-model="articleForm.content" @onUploadImg="onUploadImg" />
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="handleArticleSubmit" :loading="loading">
@@ -253,8 +253,7 @@
                                     rows="3" />
                             </el-form-item>
                             <el-form-item label="正文">
-                                <el-input type="textarea" v-model="editForm.content" placeholder="请输入文章内容"
-                                    rows="15" />
+                                <md-editor v-model="editForm.content" @onUploadImg="onUploadImg" />
                             </el-form-item>
                         </el-form>
                         <template #footer>
@@ -276,6 +275,9 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { User, Lock, Odometer, Document, Setting, SwitchButton, Edit } from '@element-plus/icons-vue'
 import request from '@/utils/request.js'
 import { useRouter } from 'vue-router'
+import { MdEditor } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
+import axios from 'axios'
 import {
     adminGetArticleList,
     adminGetArticleById,
@@ -580,6 +582,39 @@ const handleIntroductionSubmit = async () => {
     }
 }
 
+// 图片上传处理函数
+const onUploadImg = async (files, callback) => {
+    try {
+        const res = await Promise.all(
+            files.map((file) => {
+                return new Promise((rev, rej) => {
+                    const form = new FormData();
+                    form.append('file', file);
+
+                    // 调用后端上传接口 - 使用完整 URL
+                    axios.post('http://localhost:8080/api/upload', form, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': localStorage.getItem('admin_token')
+                        },
+                        withCredentials: true // 允许携带凭证
+                    })
+                    .then((res) => rev(res))
+                    .catch((error) => rej(error));
+                });
+            })
+        );
+
+        // res 是后端返回的响应对象，提取 data.url
+        const urls = res.map(item => item.data.data.url);
+        callback(urls);
+        
+        ElMessage.success('图片上传成功');
+    } catch (error) {
+        console.error('图片上传失败:', error);
+        ElMessage.error('图片上传失败，请检查后端是否启动');
+    }
+};
 
 onMounted(() => {
     window.addEventListener('admin-logout', onAdminLogout)
@@ -944,7 +979,24 @@ onUnmounted(() => {
     color: #409eff;
     margin-top: 10px;
 }
+
+/* Markdown 编辑器样式 */
+:deep(.md-editor) {
+    height: 500px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+}
+
+:deep(.md-editor-preview-wrapper) {
+    padding: 10px;
+}
 </style>
+
+
+
+
+
+
 
 
 
