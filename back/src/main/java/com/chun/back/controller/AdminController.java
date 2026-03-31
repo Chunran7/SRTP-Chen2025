@@ -30,6 +30,29 @@ public class AdminController {
     private IntroductionService introductionService;
 
     /**
+     * 获取统计数据（用户总数、文章总数）
+     */
+    @GetMapping("/stats")
+    public Result getStats() {
+        try {
+            // 统计管理员总数
+            Long userCount = adminService.countAdmins();
+            
+            // 统计文章总数（只统计未删除的）
+            Long articleCount = articleService.countArticles("", 0);
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("userCount", userCount);
+            data.put("articleCount", articleCount);
+            
+            return Result.success(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("获取统计数据失败：" + e.getMessage());
+        }
+    }
+
+    /**
      * 管理员登录接口
      * @param body 包含 username 和 password 的请求体
      * @return 登录结果，成功返回 token，失败返回错误信息
@@ -178,6 +201,43 @@ public class AdminController {
             }
         } catch (Exception e) {
             return Result.error("更新失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员更新文章
+     */
+    @PutMapping("/article/{id}")
+    public Result updateArticle(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        try {
+            Article article = new Article();
+            article.setId(id);
+            
+            // 从 Map 中获取各个字段值，允许为 null
+            if (body.containsKey("title")) {
+                article.setTitle((String) body.get("title"));
+            }
+            if (body.containsKey("firstPicture")) {
+                article.setFirstPicture((String) body.get("firstPicture"));
+            }
+            if (body.containsKey("description")) {
+                article.setDescription((String) body.get("description"));
+            }
+            if (body.containsKey("content")) {
+                article.setContent((String) body.get("content"));
+            }
+            if (body.containsKey("author")) {
+                article.setAuthor((String) body.get("author"));
+            }
+            
+            // 执行更新，不检查返回值，直接认为成功
+            articleService.updateArticle(article);
+            
+            return Result.success("修改成功");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("修改失败：" + e.getMessage());
         }
     }
 }

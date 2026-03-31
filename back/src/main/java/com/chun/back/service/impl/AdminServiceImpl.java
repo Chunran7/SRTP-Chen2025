@@ -37,4 +37,9 @@ public class AdminServiceImpl implements AdminService {
         // 4. 验证通过，返回管理员信息
         return admin;
     }
+
+    @Override
+    public Long countAdmins() {
+        return adminMapper.countAdmins();
+    }
 }

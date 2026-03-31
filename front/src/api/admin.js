@@ -98,3 +98,13 @@ export const getIntroductionService = () => {
 export const updateIntroductionService = (introData) => {
     return request.put('/admin/introduction', introData);
 }
+
+/**
+ * 管理员更新文章
+ * @param {Number} id - 文章 ID
+ * @param {Object} articleData - 文章数据，包含 title、content 等
+ * @returns {Promise} 返回 Promise 对象
+ */
+export const adminUpdateArticle = (id, articleData) => {
+    return request.put(`/admin/article/${id}`, articleData);
+}

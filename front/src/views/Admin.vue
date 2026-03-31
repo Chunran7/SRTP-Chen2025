@@ -179,9 +179,12 @@
                                         </el-tag>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="操作" width="260">
+                                <el-table-column label="操作" width="380">
                                     <template #default="{ row }">
-                                        <el-button size="small" @click="viewArticle(row)">查看</el-button>
+                                        <el-button size="small" @click="viewArticleDetail(row)">查看</el-button>
+                                        <el-button size="small" type="primary" @click="openEditDialog(row)" :disabled="row.isDeleted === 1">
+                                            编辑
+                                        </el-button>
                                         <template v-if="row.isDeleted === 1">
                                             <el-button size="small" type="success" @click="toggleArticleDelete(row)">
                                                 恢复
@@ -229,6 +232,38 @@
                             </el-form>
                         </el-card>
                     </div>
+
+                    <!-- 编辑文章对话框 -->
+                    <el-dialog v-model="editDialogVisible" title="编辑文章" width="800px" :close-on-click-modal="false">
+                        <el-form :model="editForm" label-width="80px">
+                            <el-form-item label="文章 ID">
+                                <el-input v-model="editForm.id" disabled />
+                            </el-form-item>
+                            <el-form-item label="标题">
+                                <el-input v-model="editForm.title" placeholder="请输入文章标题" />
+                            </el-form-item>
+                            <el-form-item label="作者">
+                                <el-input v-model="editForm.author" placeholder="请输入作者" />
+                            </el-form-item>
+                            <el-form-item label="封面图">
+                                <el-input v-model="editForm.firstPicture" placeholder="请输入封面图 URL" />
+                            </el-form-item>
+                            <el-form-item label="摘要">
+                                <el-input type="textarea" v-model="editForm.description" placeholder="请输入文章摘要"
+                                    rows="3" />
+                            </el-form-item>
+                            <el-form-item label="正文">
+                                <el-input type="textarea" v-model="editForm.content" placeholder="请输入文章内容"
+                                    rows="15" />
+                            </el-form-item>
+                        </el-form>
+                        <template #footer>
+                            <el-button @click="editDialogVisible = false">取消</el-button>
+                            <el-button type="primary" @click="handleEditSubmit" :loading="loading">
+                                保存修改
+                            </el-button>
+                        </template>
+                    </el-dialog>
                 </el-main>
             </el-container>
         </el-container>
@@ -240,6 +275,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User, Lock, Odometer, Document, Setting, SwitchButton, Edit } from '@element-plus/icons-vue'
 import request from '@/utils/request.js'
+import { useRouter } from 'vue-router'
 import {
     adminGetArticleList,
     adminGetArticleById,
@@ -247,8 +283,12 @@ import {
     adminRestoreArticle,
     adminHardDeleteArticle,
     getIntroductionService,
-    updateIntroductionService
+    updateIntroductionService,
+    adminUpdateArticle
 } from '@/api/admin.js'
+
+// 获取路由实例
+const router = useRouter()
 
 // ================= 状态定义 =================
 const isLoggedIn = ref(false)
@@ -273,6 +313,17 @@ const introductionForm = reactive({
     title: '',
     content: '',
     imageUrl: ''
+})
+
+// 编辑文章相关
+const editDialogVisible = ref(false)
+const editForm = reactive({
+    id: null,
+    title: '',
+    firstPicture: '',
+    description: '',
+    content: '',
+    author: ''
 })
 
 const fetchAdminArticles = async () => {
@@ -304,13 +355,12 @@ const fetchAdminArticles = async () => {
     }
 }
 
-const viewArticle = async (row) => {
-    try {
-        const a = await adminGetArticleById(row.id)
-        ElMessageBox.alert(a.content || a.description || '无内容', a.title || '文章预览', {
-            dangerouslyUseHTMLString: false
-        })
-    } catch (e) { }
+const viewArticleDetail = (row) => {
+    // 跳转到文章详情页，在新窗口打开
+    const routeUrl = router.resolve({
+        path: `/article/${row.id}`
+    })
+    window.open(routeUrl.href, '_blank')
 }
 
 const toggleArticleDelete = async (row) => {
@@ -338,6 +388,49 @@ const hardDeleteArticle = async (row) => {
         ElMessage.success('已彻底删除')
         fetchAdminArticles()
     } catch (e) { }
+}
+
+// 打开编辑对话框
+const openEditDialog = async (row) => {
+    try {
+        const res = await adminGetArticleById(row.id)
+        // 拦截器返回的是 {code, data}，需要再次访问 res.data 获取实际文章数据
+        const article = res.data
+        
+        editForm.id = article.id
+        editForm.title = article.title
+        editForm.firstPicture = article.firstPicture || ''
+        editForm.description = article.description || ''
+        editForm.content = article.content || ''
+        editForm.author = article.author || ''
+        editDialogVisible.value = true
+    } catch (e) {
+        ElMessage.error(e?.message || '获取文章详情失败')
+    }
+}
+
+// 保存编辑
+const handleEditSubmit = async () => {
+    if (!editForm.title) {
+        return ElMessage.warning('请输入标题')
+    }
+    loading.value = true
+    try {
+        await adminUpdateArticle(editForm.id, {
+            title: editForm.title,
+            firstPicture: editForm.firstPicture,
+            description: editForm.description,
+            content: editForm.content,
+            author: editForm.author
+        })
+        ElMessage.success('修改成功')
+        editDialogVisible.value = false
+        fetchAdminArticles()
+    } catch (e) {
+        ElMessage.error(e?.message || '修改失败')
+    } finally {
+        loading.value = false
+    }
 }
 
 const articleForm = ref({
@@ -428,12 +521,14 @@ const getMenuName = (key) => {
 // 4. 数据获取
 const fetchStats = async () => {
     try {
-        const data = await request.get('/admin/stats')
-        stats.value = data || {
+        const res = await request.get('/admin/stats')
+        // 拦截器返回的是 {code, data}，需要访问 res.data 获取实际数据
+        stats.value = res.data || {
             userCount: 0,
             articleCount: 0
         }
     } catch (e) {
+        console.error('获取统计数据失败:', e)
         // 401 会被 request.js 统一处理并触发 admin-logout
     }
 }
@@ -850,3 +945,23 @@ onUnmounted(() => {
     margin-top: 10px;
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

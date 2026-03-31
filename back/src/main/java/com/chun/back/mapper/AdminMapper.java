@@ -14,4 +14,11 @@ public interface AdminMapper {
      */
     @Select("SELECT * FROM admin WHERE username = #{username}")
     Admin findByUsername(String username);
+
+    /**
+     * 统计管理员总数
+     * @return 管理员数量
+     */
+    @Select("SELECT COUNT(*) FROM admin")
+    Long countAdmins();
 }

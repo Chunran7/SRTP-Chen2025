@@ -76,4 +76,19 @@ public interface ArticleMapper {
             "</where>" +
             "</script>")
     Long countArticles(@Param("keyword") String keyword, @Param("includeDeleted") Integer includeDeleted);
+
+    // 更新文章
+    @Update("<script>" +
+            "UPDATE article " +
+            "<set>" +
+            "<if test=\"title != null\">title = #{title},</if>" +
+            "<if test=\"firstPicture != null\">first_picture = #{firstPicture},</if>" +
+            "<if test=\"description != null\">description = #{description},</if>" +
+            "<if test=\"content != null\">content = #{content},</if>" +
+            "<if test=\"author != null\">author = #{author},</if>" +
+            "update_time = NOW()," +
+            "</set>" +
+            "WHERE id = #{id}" +
+            "</script>")
+    int updateArticle(Article article);
 }

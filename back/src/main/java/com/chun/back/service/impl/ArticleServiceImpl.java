@@ -65,4 +65,9 @@ public class ArticleServiceImpl implements ArticleService {
         return articleMapper.countArticles(keyword, includeDeleted);
     }
 
+    @Override
+    public int updateArticle(Article article) {
+        return articleMapper.updateArticle(article);
+    }
+
 }

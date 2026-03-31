@@ -18,4 +18,10 @@ public interface AdminService {
      * @return 登录成功返回 Admin 对象，失败返回 null
      */
     Admin login(String username, String password);
+
+    /**
+     * 统计管理员总数
+     * @return 管理员数量
+     */
+    Long countAdmins();
 }

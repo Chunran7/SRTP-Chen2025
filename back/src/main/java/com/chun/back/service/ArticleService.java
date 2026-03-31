@@ -31,4 +31,7 @@ public interface ArticleService {
 
     // 统计文章总数
     Long countArticles(String keyword, Integer includeDeleted);
+
+    // 更新文章
+    int updateArticle(Article article);
 }
