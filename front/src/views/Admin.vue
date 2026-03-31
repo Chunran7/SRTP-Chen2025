@@ -131,7 +131,34 @@
                                     <el-input v-model="articleForm.author" />
                                 </el-form-item>
                                 <el-form-item label="封面">
-                                    <el-input v-model="articleForm.firstPicture" placeholder="图片 URL" />
+                                    <div style="display: flex; gap: 10px; align-items: center">
+                                        <el-input v-model="articleForm.firstPicture" placeholder="图片 URL 或点击上传" style="flex: 1" />
+                                        <el-upload
+                                            action="#"
+                                            :http-request="uploadCoverImage"
+                                            :show-file-list="false"
+                                            :before-upload="beforeCoverUpload"
+                                            accept="image/*">
+                                            <el-button type="primary" :loading="uploadingCover">
+                                                <el-icon><Upload /></el-icon>
+                                                上传
+                                            </el-button>
+                                        </el-upload>
+                                    </div>
+                                    <!-- 图片预览 -->
+                                    <div v-if="articleForm.firstPicture" style="margin-top: 10px">
+                                        <el-image 
+                                            :src="articleForm.firstPicture" 
+                                            :preview-src-list="[articleForm.firstPicture]"
+                                            style="width: 200px; height: 120px; border-radius: 4px"
+                                            fit="cover">
+                                            <template #error>
+                                                <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999">
+                                                    <el-icon><Picture /></el-icon>
+                                                </div>
+                                            </template>
+                                        </el-image>
+                                    </div>
                                 </el-form-item>
                                 <el-form-item label="摘要">
                                     <el-input type="textarea" v-model="articleForm.description" />
@@ -246,7 +273,34 @@
                                 <el-input v-model="editForm.author" placeholder="请输入作者" />
                             </el-form-item>
                             <el-form-item label="封面图">
-                                <el-input v-model="editForm.firstPicture" placeholder="请输入封面图 URL" />
+                                <div style="display: flex; gap: 10px; align-items: center">
+                                    <el-input v-model="editForm.firstPicture" placeholder="图片 URL 或点击上传" style="flex: 1" />
+                                    <el-upload
+                                        action="#"
+                                        :http-request="uploadCoverImage"
+                                        :show-file-list="false"
+                                        :before-upload="beforeCoverUpload"
+                                        accept="image/*">
+                                        <el-button type="primary" :loading="uploadingCover">
+                                            <el-icon><Upload /></el-icon>
+                                            上传
+                                        </el-button>
+                                    </el-upload>
+                                </div>
+                                <!-- 图片预览 -->
+                                <div v-if="editForm.firstPicture" style="margin-top: 10px">
+                                    <el-image 
+                                        :src="editForm.firstPicture" 
+                                        :preview-src-list="[editForm.firstPicture]"
+                                        style="width: 200px; height: 120px; border-radius: 4px"
+                                        fit="cover">
+                                        <template #error>
+                                            <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999">
+                                                <el-icon><Picture /></el-icon>
+                                            </div>
+                                        </template>
+                                    </el-image>
+                                </div>
                             </el-form-item>
                             <el-form-item label="摘要">
                                 <el-input type="textarea" v-model="editForm.description" placeholder="请输入文章摘要"
@@ -272,7 +326,7 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User, Lock, Odometer, Document, Setting, SwitchButton, Edit } from '@element-plus/icons-vue'
+import { User, Lock, Odometer, Document, Setting, SwitchButton, Edit, Upload, Picture } from '@element-plus/icons-vue'
 import request from '@/utils/request.js'
 import { useRouter } from 'vue-router'
 import { MdEditor } from 'md-editor-v3'
@@ -442,6 +496,63 @@ const articleForm = ref({
     content: '',
     author: '管理员'
 })
+
+// 封面图片上传相关状态
+const uploadingCover = ref(false)
+
+// 封面上传前的校验
+const beforeCoverUpload = (file) => {
+    const isImage = file.type.startsWith('image/');
+    const isLt10M = file.size / 1024 / 1024 < 10;
+
+    if (!isImage) {
+        ElMessage.error('只能上传图片文件！');
+        return false;
+    }
+    if (!isLt10M) {
+        ElMessage.error('图片大小不能超过 10MB！');
+        return false;
+    }
+    return true;
+};
+
+// 封面图片上传处理
+const uploadCoverImage = async (options) => {
+    const { file, onSuccess, onError } = options;
+    uploadingCover.value = true;
+
+    try {
+        const form = new FormData();
+        form.append('file', file);
+
+        const res = await axios.post('http://localhost:8080/api/upload', form, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': localStorage.getItem('admin_token')
+            },
+            withCredentials: true
+        });
+
+        // 获取返回的 URL
+        const url = res.data.data.url;
+        
+        // 更新封面 URL
+        if (activeMenu.value === 'publish') {
+            articleForm.value.firstPicture = url;
+        } else {
+            editForm.firstPicture = url;
+        }
+
+        ElMessage.success('封面上传成功');
+        onSuccess();
+    } catch (error) {
+        console.error('封面上传失败:', error);
+        ElMessage.error('封面上传失败');
+        onError(error);
+    } finally {
+        uploadingCover.value = false;
+    }
+};
 
 // 监听登出事件
 const onAdminLogout = () => {
@@ -991,6 +1102,14 @@ onUnmounted(() => {
     padding: 10px;
 }
 </style>
+
+
+
+
+
+
+
+
 
 
 

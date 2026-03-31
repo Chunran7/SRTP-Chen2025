@@ -13,7 +13,7 @@
         <el-row :gutter="24" v-else>
           <el-col :span="8" v-for="article in pagedArticles" :key="article.id">
             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
-              <img :src="article.firstpicture || 'https://placehold.co/300x150'" alt="封面图" class="article-img" />
+              <img :src="article.firstPicture || 'https://placehold.co/300x150'" alt="封面图" class="article-img" />
               <h3 class="article-title">{{ article.title }}</h3>
               <p class="article-description">{{ truncate(article.description, 35) }}</p>
 
@@ -140,7 +140,7 @@ onMounted(() => {
 
 .article-img {
   width: 100%;
-  height: 150px;
+  height: 180px;
   object-fit: cover;
   border-radius: 4px;
   margin-bottom: 10px;
