@@ -19,6 +19,12 @@ mybatis:
 admin:
   token: secret-admin-token
 
-# 文件上传路径配置（请根据实际情况修改）
+# 文件上传路径配置
 file:
   upload-path: C:/Users/Chunran/Desktop/SRTPchen2025/uploads/
+  # 各类图片的子目录
+  sub-paths:
+    article: articles/          # 文章首图
+    content: content/           # 文章内容图片（编辑器上传）
+    introduction: introductions/ # 介绍页面图片
+    avatar: avatars/            # 用户头像

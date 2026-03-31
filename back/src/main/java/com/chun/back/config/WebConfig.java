@@ -19,6 +19,18 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${file.upload-path}")
     private String uploadPath;
 
+    @Value("${file.sub-paths.article:articles/}")
+    private String articleSubPath;
+
+    @Value("${file.sub-paths.content:content/}")
+    private String contentSubPath;
+
+    @Value("${file.sub-paths.introduction:introductions/}")
+    private String introductionSubPath;
+
+    @Value("${file.sub-paths.avatar:avatars/}")
+    private String avatarSubPath;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // 全局跨域配置
@@ -55,7 +67,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 配置静态资源映射：当访问 /images/** 时，从本地磁盘路径读取
+        // 映射所有子目录，支持分类图片访问
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:" + uploadPath.replace("\\", "/"));
+                .addResourceLocations(
+                    "file:" + uploadPath.replace("\\", "/"),
+                    "file:" + (uploadPath + articleSubPath).replace("\\", "/"),
+                    "file:" + (uploadPath + contentSubPath).replace("\\", "/"),
+                    "file:" + (uploadPath + introductionSubPath).replace("\\", "/"),
+                    "file:" + (uploadPath + avatarSubPath).replace("\\", "/")
+                );
     }
 }

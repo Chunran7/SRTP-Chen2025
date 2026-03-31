@@ -245,7 +245,12 @@
                                     <el-input v-model="introductionForm.title" placeholder="请输入标题" />
                                 </el-form-item>
                                 <el-form-item label="图片 URL">
-                                    <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL" />
+                                    <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL 或点击右侧按钮上传" 
+                                              style="width: 70%; margin-right: 10px;" />
+                                    <el-upload :http-request="uploadIntroductionImage" :show-file-list="false" 
+                                               :before-upload="() => true">
+                                        <el-button type="primary" :loading="uploadingIntroImage">上传图片</el-button>
+                                    </el-upload>
                                 </el-form-item>
                                 <el-form-item label="介绍内容">
                                     <el-input v-model="introductionForm.content" type="textarea" rows="10"
@@ -524,6 +529,7 @@ const uploadCoverImage = async (options) => {
     try {
         const form = new FormData();
         form.append('file', file);
+        form.append('type', 'article'); // 指定为文章首图类型
 
         const res = await axios.post('http://localhost:8080/api/upload', form, {
             headers: {
@@ -551,6 +557,42 @@ const uploadCoverImage = async (options) => {
         onError(error);
     } finally {
         uploadingCover.value = false;
+    }
+};
+
+// 介绍图片上传处理
+const uploadingIntroImage = ref(false);
+const uploadIntroductionImage = async (options) => {
+    const { file, onSuccess, onError } = options;
+    uploadingIntroImage.value = true;
+
+    try {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('type', 'introduction'); // 指定为介绍页面图片类型
+
+        const res = await axios.post('http://localhost:8080/api/upload', form, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': localStorage.getItem('admin_token')
+            },
+            withCredentials: true
+        });
+
+        // 获取返回的 URL
+        const url = res.data.data.url;
+        
+        // 更新介绍图片 URL
+        introductionForm.imageUrl = url;
+
+        ElMessage.success('图片上传成功');
+        onSuccess();
+    } catch (error) {
+        console.error('图片上传失败:', error);
+        ElMessage.error('图片上传失败');
+        onError(error);
+    } finally {
+        uploadingIntroImage.value = false;
     }
 };
 
@@ -701,6 +743,7 @@ const onUploadImg = async (files, callback) => {
                 return new Promise((rev, rej) => {
                     const form = new FormData();
                     form.append('file', file);
+                    form.append('type', 'content'); // 指定为内容图片类型
 
                     // 调用后端上传接口 - 使用完整 URL
                     axios.post('http://localhost:8080/api/upload', form, {
@@ -1102,37 +1145,4 @@ onUnmounted(() => {
     padding: 10px;
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
