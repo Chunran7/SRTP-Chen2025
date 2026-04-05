@@ -133,7 +133,7 @@
                                 <el-form-item label="封面">
                                     <div style="display: flex; gap: 10px; align-items: center">
                                         <el-input v-model="articleForm.firstPicture" placeholder="图片 URL 或点击上传"
-                                            style="flex: 1" />
+                                            style="flex: 1" disabled />
                                         <el-upload action="#" :http-request="uploadCoverImage" :show-file-list="false"
                                             :before-upload="beforeCoverUpload" accept="image/*">
                                             <el-button type="primary" :loading="uploadingCover">
@@ -145,7 +145,7 @@
                                         </el-upload>
                                     </div>
                                     <!-- 图片预览 -->
-                                    <div v-if="articleForm.firstPicture" style="margin-top: 10px">
+                                    <div v-if="articleForm.firstPicture" style="margin-left: 16px">
                                         <el-image :src="articleForm.firstPicture"
                                             :preview-src-list="[articleForm.firstPicture]"
                                             style="width: 200px; height: 120px; border-radius: 4px" fit="cover">
@@ -246,12 +246,29 @@
                                     <el-input v-model="introductionForm.title" placeholder="请输入标题" />
                                 </el-form-item>
                                 <el-form-item label="图片 URL">
-                                    <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL 或点击右侧按钮上传"
-                                        style="width: 70%; margin-right: 10px;" />
-                                    <el-upload :http-request="uploadIntroductionImage" :show-file-list="false"
-                                        :before-upload="() => true">
-                                        <el-button type="primary" :loading="uploadingIntroImage">上传图片</el-button>
-                                    </el-upload>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL 或点击右侧按钮上传"
+                                            style="flex: 1;" disabled />
+                                        <el-upload :http-request="uploadIntroductionImage" :show-file-list="false"
+                                            :before-upload="() => true">
+                                            <el-button type="primary" :loading="uploadingIntroImage">上传图片</el-button>
+                                        </el-upload>
+                                    </div>
+                                    <!-- 图片预览 -->
+                                    <div v-if="introductionForm.imageUrl" style="margin-left: 16px">
+                                        <el-image :src="introductionForm.imageUrl"
+                                            :preview-src-list="[introductionForm.imageUrl]"
+                                            style="width: 300px; height: 200px; border-radius: 4px" fit="cover">
+                                            <template #error>
+                                                <div
+                                                    style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999">
+                                                    <el-icon>
+                                                        <Picture />
+                                                    </el-icon>
+                                                </div>
+                                            </template>
+                                        </el-image>
+                                    </div>
                                 </el-form-item>
                                 <el-form-item label="介绍内容">
                                     <md-editor v-model="introductionForm.content" />
@@ -279,8 +296,8 @@
                             </el-form-item>
                             <el-form-item label="封面图">
                                 <div style="display: flex; gap: 10px; align-items: center">
-                                    <el-input v-model="editForm.firstPicture" placeholder="图片 URL 或点击上传"
-                                        style="flex: 1" />
+                                    <el-input v-model="editForm.firstPicture" placeholder="图片 URL 或点击上传" style="flex: 1"
+                                        disabled />
                                     <el-upload action="#" :http-request="uploadCoverImage" :show-file-list="false"
                                         :before-upload="beforeCoverUpload" accept="image/*">
                                         <el-button type="primary" :loading="uploadingCover">
@@ -292,7 +309,7 @@
                                     </el-upload>
                                 </div>
                                 <!-- 图片预览 -->
-                                <div v-if="editForm.firstPicture" style="margin-top: 10px">
+                                <div v-if="editForm.firstPicture" style="margin-left: 16px">
                                     <el-image :src="editForm.firstPicture" :preview-src-list="[editForm.firstPicture]"
                                         style="width: 200px; height: 120px; border-radius: 4px" fit="cover">
                                         <template #error>
