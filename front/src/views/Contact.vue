@@ -9,10 +9,12 @@
       <!-- 微信公众号 -->
       <div class="contact-card">
         <div class="card-icon">
-          <el-icon :size="48"><ChatDotRound /></el-icon>
+          <el-icon :size="48">
+            <ChatDotRound />
+          </el-icon>
         </div>
         <h2>微信公众号</h2>
-        <p class="account-name">医路同行</p>
+        <p class="account-name">医路同行-职业丧痛支持</p>
         <div class="qr-code">
           <img :src="wechatQrCode" alt="微信公众号二维码" />
           <p>扫描二维码关注我们</p>
@@ -22,13 +24,17 @@
       <!-- 小红书账号 -->
       <div class="contact-card">
         <div class="card-icon">
-          <el-icon :size="48"><Star /></el-icon>
+          <el-icon :size="48">
+            <Star />
+          </el-icon>
         </div>
         <h2>小红书账号</h2>
         <p class="account-name">@医路同行</p>
         <div class="social-link">
           <el-button type="danger" @click="openXiaohongshu">
-            <el-icon><Link /></el-icon>
+            <el-icon>
+              <Link />
+            </el-icon>
             前往主页
           </el-button>
         </div>
@@ -43,14 +49,14 @@
 
 <script setup>
 import { ChatDotRound, Star, Link } from '@element-plus/icons-vue'
+import wechatQrCode from '@/assets/QRcode.jpg'
 
 // TODO: 请将 wechat-qr.jpg 放到 src/assets/ 目录下
 // 临时使用占位图，实际使用时请替换为：import wechatQrCode from '@/assets/wechat-qr.jpg'
-const wechatQrCode = 'https://via.placeholder.com/200x200?text=WeChat+QR'
 
 // 打开小红书链接
 const openXiaohongshu = () => {
-  window.open('https://www.xiaohongshu.com', '_blank')
+  window.open('https://xhslink.com/m/9cxc81M7MOs', '_blank')
 }
 </script>
 

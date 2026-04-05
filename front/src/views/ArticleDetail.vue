@@ -3,6 +3,7 @@
         <!-- 主体内容 -->
         <el-main class="main">
             <div class="main-container">
+                <!-- 文章存在时显示内容 -->
                 <div v-if="article" class="content">
                     <div class="article-title">{{ article.title }}</div>
                     <div class="article-info">
@@ -11,7 +12,24 @@
                     </div>
                     <div class="article-content" v-html="renderedContent"></div>
                 </div>
-                <div v-else class="article-title">正在加载...</div>
+                
+                <!-- 文章不存在时显示错误提示 -->
+                <div v-else-if="loadError" class="error-container">
+                    <el-result
+                        icon="warning"
+                        title="文章不存在"
+                        sub-title="抱歉，您访问的文章不存在或已被删除"
+                    >
+                        <template #extra>
+                            <el-button type="primary" @click="goBack">返回文章列表</el-button>
+                        </template>
+                    </el-result>
+                </div>
+                
+                <!-- 加载中状态 -->
+                <div v-else class="loading-container">
+                    <el-skeleton :rows="10" animated />
+                </div>
             </div>
         </el-main>
 
@@ -23,15 +41,16 @@
 <script setup>
 import Footer from '../components/Footer.vue'
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { ElMessage } from 'element-plus';
+import { useRoute, useRouter } from 'vue-router';
 import { marked } from 'marked';
 import { computed } from 'vue';
 import { getArticleByIdService } from '@/api/article.js'; // 导入文章详情服务函数
 
 
 const route = useRoute();
+const router = useRouter();
 const article = ref(null);
+const loadError = ref(false);
 
 const renderedContent = computed(() => {
     if (article.value && article.value.content) {
@@ -46,17 +65,23 @@ const getArticleDetail = async () => {
         // 使用API服务函数替代直接调用request
         const res = await getArticleByIdService(id);
         console.log('后端返回的数据:', res)
+        
         if (res.code === 0) {
             console.log('文章数据:', res.data); // 添加这行来查看具体字段
             article.value = res.data;
         } else {
-            ElMessage.error(res.msg);
+            // 文章不存在或已被删除
+            loadError.value = true;
         }
     } catch (err) {
         console.error('Failed to fetch article detail:', err);
+        loadError.value = true;
     }
+}
 
-
+// 返回文章列表
+const goBack = () => {
+    router.push('/article');
 }
 
 onMounted(() => {
@@ -86,6 +111,17 @@ onMounted(() => {
     margin: 30px auto;
     border-radius: 25px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* 错误提示容器样式 */
+.error-container {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+/* 加载骨架屏容器样式 */
+.loading-container {
+    padding: 50px;
 }
 
 .article-title {
