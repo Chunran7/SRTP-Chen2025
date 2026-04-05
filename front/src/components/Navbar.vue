@@ -8,6 +8,7 @@
       :default-active="activeIndex">
       <el-menu-item index="/home" @click="router.push('/home')">首页</el-menu-item>
       <el-menu-item index="/article" @click="router.push('/article')">文章</el-menu-item>
+      <el-menu-item index="/contact" @click="router.push('/contact')">联系我们</el-menu-item>
     </el-menu>
     <div class="navbar-right">
       <el-button v-if="!isLoggedIn" @click="router.push('/login')" type="primary">登录/注册</el-button>

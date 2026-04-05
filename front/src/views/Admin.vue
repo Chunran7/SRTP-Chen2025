@@ -132,29 +132,29 @@
                                 </el-form-item>
                                 <el-form-item label="封面">
                                     <div style="display: flex; gap: 10px; align-items: center">
-                                        <el-input v-model="articleForm.firstPicture" placeholder="图片 URL 或点击上传" style="flex: 1" />
-                                        <el-upload
-                                            action="#"
-                                            :http-request="uploadCoverImage"
-                                            :show-file-list="false"
-                                            :before-upload="beforeCoverUpload"
-                                            accept="image/*">
+                                        <el-input v-model="articleForm.firstPicture" placeholder="图片 URL 或点击上传"
+                                            style="flex: 1" />
+                                        <el-upload action="#" :http-request="uploadCoverImage" :show-file-list="false"
+                                            :before-upload="beforeCoverUpload" accept="image/*">
                                             <el-button type="primary" :loading="uploadingCover">
-                                                <el-icon><Upload /></el-icon>
+                                                <el-icon>
+                                                    <Upload />
+                                                </el-icon>
                                                 上传
                                             </el-button>
                                         </el-upload>
                                     </div>
                                     <!-- 图片预览 -->
                                     <div v-if="articleForm.firstPicture" style="margin-top: 10px">
-                                        <el-image 
-                                            :src="articleForm.firstPicture" 
+                                        <el-image :src="articleForm.firstPicture"
                                             :preview-src-list="[articleForm.firstPicture]"
-                                            style="width: 200px; height: 120px; border-radius: 4px"
-                                            fit="cover">
+                                            style="width: 200px; height: 120px; border-radius: 4px" fit="cover">
                                             <template #error>
-                                                <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999">
-                                                    <el-icon><Picture /></el-icon>
+                                                <div
+                                                    style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999">
+                                                    <el-icon>
+                                                        <Picture />
+                                                    </el-icon>
                                                 </div>
                                             </template>
                                         </el-image>
@@ -209,7 +209,8 @@
                                 <el-table-column label="操作" width="380">
                                     <template #default="{ row }">
                                         <el-button size="small" @click="viewArticleDetail(row)">查看</el-button>
-                                        <el-button size="small" type="primary" @click="openEditDialog(row)" :disabled="row.isDeleted === 1">
+                                        <el-button size="small" type="primary" @click="openEditDialog(row)"
+                                            :disabled="row.isDeleted === 1">
                                             编辑
                                         </el-button>
                                         <template v-if="row.isDeleted === 1">
@@ -245,16 +246,15 @@
                                     <el-input v-model="introductionForm.title" placeholder="请输入标题" />
                                 </el-form-item>
                                 <el-form-item label="图片 URL">
-                                    <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL 或点击右侧按钮上传" 
-                                              style="width: 70%; margin-right: 10px;" />
-                                    <el-upload :http-request="uploadIntroductionImage" :show-file-list="false" 
-                                               :before-upload="() => true">
+                                    <el-input v-model="introductionForm.imageUrl" placeholder="请输入图片 URL 或点击右侧按钮上传"
+                                        style="width: 70%; margin-right: 10px;" />
+                                    <el-upload :http-request="uploadIntroductionImage" :show-file-list="false"
+                                        :before-upload="() => true">
                                         <el-button type="primary" :loading="uploadingIntroImage">上传图片</el-button>
                                     </el-upload>
                                 </el-form-item>
                                 <el-form-item label="介绍内容">
-                                    <el-input v-model="introductionForm.content" type="textarea" rows="10"
-                                        placeholder="请输入介绍内容" />
+                                    <md-editor v-model="introductionForm.content" />
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="handleIntroductionSubmit" :loading="loading">
@@ -279,29 +279,28 @@
                             </el-form-item>
                             <el-form-item label="封面图">
                                 <div style="display: flex; gap: 10px; align-items: center">
-                                    <el-input v-model="editForm.firstPicture" placeholder="图片 URL 或点击上传" style="flex: 1" />
-                                    <el-upload
-                                        action="#"
-                                        :http-request="uploadCoverImage"
-                                        :show-file-list="false"
-                                        :before-upload="beforeCoverUpload"
-                                        accept="image/*">
+                                    <el-input v-model="editForm.firstPicture" placeholder="图片 URL 或点击上传"
+                                        style="flex: 1" />
+                                    <el-upload action="#" :http-request="uploadCoverImage" :show-file-list="false"
+                                        :before-upload="beforeCoverUpload" accept="image/*">
                                         <el-button type="primary" :loading="uploadingCover">
-                                            <el-icon><Upload /></el-icon>
+                                            <el-icon>
+                                                <Upload />
+                                            </el-icon>
                                             上传
                                         </el-button>
                                     </el-upload>
                                 </div>
                                 <!-- 图片预览 -->
                                 <div v-if="editForm.firstPicture" style="margin-top: 10px">
-                                    <el-image 
-                                        :src="editForm.firstPicture" 
-                                        :preview-src-list="[editForm.firstPicture]"
-                                        style="width: 200px; height: 120px; border-radius: 4px"
-                                        fit="cover">
+                                    <el-image :src="editForm.firstPicture" :preview-src-list="[editForm.firstPicture]"
+                                        style="width: 200px; height: 120px; border-radius: 4px" fit="cover">
                                         <template #error>
-                                            <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999">
-                                                <el-icon><Picture /></el-icon>
+                                            <div
+                                                style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999">
+                                                <el-icon>
+                                                    <Picture />
+                                                </el-icon>
                                             </div>
                                         </template>
                                     </el-image>
@@ -457,7 +456,7 @@ const openEditDialog = async (row) => {
         const res = await adminGetArticleById(row.id)
         // 拦截器返回的是 {code, data}，需要再次访问 res.data 获取实际文章数据
         const article = res.data
-        
+
         editForm.id = article.id
         editForm.title = article.title
         editForm.firstPicture = article.firstPicture || ''
@@ -541,7 +540,7 @@ const uploadCoverImage = async (options) => {
 
         // 获取返回的 URL
         const url = res.data.data.url;
-        
+
         // 更新封面 URL
         if (activeMenu.value === 'publish') {
             articleForm.value.firstPicture = url;
@@ -581,7 +580,7 @@ const uploadIntroductionImage = async (options) => {
 
         // 获取返回的 URL
         const url = res.data.data.url;
-        
+
         // 更新介绍图片 URL
         introductionForm.imageUrl = url;
 
@@ -690,10 +689,11 @@ const fetchStats = async () => {
 
 const fetchIntroduction = async () => {
     try {
-        const data = await getIntroductionService()
-        introductionForm.title = data.title
-        introductionForm.content = data.content
-        introductionForm.imageUrl = data.imageUrl
+        const res = await getIntroductionService()
+        // res 是 {code: 0, data: {...}}，需要访问 res.data 获取实际数据
+        introductionForm.title = res.data.title
+        introductionForm.content = res.data.content
+        introductionForm.imageUrl = res.data.imageUrl
     } catch (e) {
         ElMessage.error(e?.message || '获取介绍信息失败')
     }
@@ -753,8 +753,8 @@ const onUploadImg = async (files, callback) => {
                         },
                         withCredentials: true // 允许携带凭证
                     })
-                    .then((res) => rev(res))
-                    .catch((error) => rej(error));
+                        .then((res) => rev(res))
+                        .catch((error) => rej(error));
                 });
             })
         );
@@ -762,7 +762,7 @@ const onUploadImg = async (files, callback) => {
         // res 是后端返回的响应对象，提取 data.url
         const urls = res.map(item => item.data.data.url);
         callback(urls);
-        
+
         ElMessage.success('图片上传成功');
     } catch (error) {
         console.error('图片上传失败:', error);
@@ -1145,4 +1145,3 @@ onUnmounted(() => {
     padding: 10px;
 }
 </style>
-

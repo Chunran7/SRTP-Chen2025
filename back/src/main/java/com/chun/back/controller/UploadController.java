@@ -35,35 +35,21 @@ public class UploadController {
 
     /**
      * 通用上传接口，根据 type 参数自动分类存储
+     * 
      * @param file 上传的文件
      * @param type 图片类型：article(文章首图), content(内容图片), introduction(介绍图片), avatar(头像)
      */
     @PostMapping("/upload")
-    public Result upload(@RequestParam("file") MultipartFile file, 
-                        @RequestParam(value = "type", defaultValue = "content") String type) throws IOException {
-        // 调试输出：确认接收到的参数
-        System.out.println("===== 接收到上传请求 =====");
-        System.out.println("图片类型：" + type);
-        System.out.println("原始文件名：" + file.getOriginalFilename());
-        
-        if (file.isEmpty()) {
-            return Result.error("文件为空");
-        }
+    public Result upload(@RequestParam("file") MultipartFile file,
+            @RequestParam(value = "type", defaultValue = "content") String type) throws IOException {
 
         // 1. 根据类型选择子目录
         String subPath = getSubPath(type);
-        
+
         // 2. 添加日期子目录（例如：2026-03/）
         String dateDir = java.time.LocalDate.now().format(
-            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM")
-        ) + "/";
-        
-        // 调试输出：确认选择的子路径
-        System.out.println("选择的子路径：" + subPath);
-        System.out.println("日期目录：" + dateDir);
-        System.out.println("完整保存路径：" + uploadPath + subPath + dateDir);
-        System.out.println("========================");
-        
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM")) + "/";
+
         // 3. 生成唯一文件名，防止重名
         String originalFilename = file.getOriginalFilename();
         String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));

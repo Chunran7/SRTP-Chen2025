@@ -7,6 +7,7 @@ import ArticleVue from "@/views/Article.vue";
 import ArticleDetailVue from "@/views/ArticleDetail.vue";
 import ProfileVue from "@/views/Profile.vue";
 import AdminVue from "@/views/Admin.vue";
+import ContactVue from "@/views/Contact.vue";
 
 // 定义路由
 const routes = [
@@ -49,6 +50,11 @@ const routes = [
     meta: {
       requiresAuth: false,
     },
+  },
+  {
+    path: "/contact",
+    name: "Contact",
+    component: ContactVue,
   },
 
   // 可以添加更多路由
