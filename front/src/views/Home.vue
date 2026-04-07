@@ -3,9 +3,14 @@
         <!-- 主体内容 -->
         <el-main class="main">
             <!-- 走马灯 -->
-            <el-carousel height="200px">
-                <el-carousel-item v-for="item in 4" :key="item">
-                    <h3 class="carousel-text">轮播内容 {{ item }}</h3>
+            <el-carousel height="300px" indicator-position="outside">
+                <el-carousel-item v-for="item in carouselItems" :key="item.id">
+                    <div class="carousel-item">
+                        <img :src="item.image" :alt="item.title" class="carousel-image" />
+                        <div class="carousel-overlay">
+                            <h3 class="carousel-title">{{ item.title }}</h3>
+                        </div>
+                    </div>
                 </el-carousel-item>
             </el-carousel>
 
@@ -33,10 +38,27 @@
                     <el-row :gutter="24" v-else>
                         <el-col :span="8" v-for="article in articles" :key="article.id">
                             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
-                                <img :src="article.firstPicture || 'https://placehold.co/300x150'" alt="封面图"
-                                    class="article-img" />
-                                <h3 class="article-title">{{ article.title }}</h3>
-                                <p class="article-description">{{ truncate(article.description, 35) }}</p>
+                                <div class="card-image-wrapper">
+                                    <img :src="article.firstPicture || 'https://placehold.co/400x250?text=暂无图片'" 
+                                        alt="封面图" class="article-img" />
+                                    <div class="card-badge">
+                                        <el-tag size="small" type="primary">最新</el-tag>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <h3 class="article-title">{{ article.title }}</h3>
+                                    <p class="article-description">{{ article.description || '暂无摘要' }}</p>
+                                    <div class="card-meta">
+                                        <span class="meta-item">
+                                            <el-icon><User /></el-icon>
+                                            {{ article.author }}
+                                        </span>
+                                        <span class="meta-item">
+                                            <el-icon><Clock /></el-icon>
+                                            {{ formatDate(article.createTime) }}
+                                        </span>
+                                    </div>
+                                </div>
                             </el-card>
                         </el-col>
                     </el-row>
@@ -53,6 +75,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { User, Clock } from '@element-plus/icons-vue'
 import Footer from '@/components/Footer.vue'
 import { getArticleLatestService } from '@/api/article.js'
 import { getIntroductionService } from '@/api/admin.js'
@@ -69,6 +92,14 @@ const introduction = ref({
     imageUrl: '/images/introduction.png'
 })
 
+// 轮播图数据
+const carouselItems = ref([
+    { id: 1, title: '关注医务人员心理健康', image: 'https://placehold.co/1200x300?text=关爱医务人员' },
+    { id: 2, title: '职业丧痛研究与支持', image: 'https://placehold.co/1200x300?text=职业支持' },
+    { id: 3, title: '专业团队为您服务', image: 'https://placehold.co/1200x300?text=专业团队' },
+    { id: 4, title: '共同守护健康', image: 'https://placehold.co/1200x300?text=守护健康' }
+])
+
 // 渲染 Markdown 内容为 HTML
 const renderedContent = computed(() => {
     return marked(introduction.value.content || '')
@@ -78,9 +109,11 @@ const handleLogin = () => {
     router.push('/login')
 }
 
-// 摘要截断函数
-const truncate = (text, maxLen) => {
-    return text?.length <= maxLen ? text : text?.slice(0, maxLen) + '...'
+// 格式化日期
+const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
 }
 
 const getArticleLatest = async () => {
@@ -125,38 +158,76 @@ const goToArticle = (id) => {
 }
 
 .main {
-    background-color: #ffffff;
+    background-color: #f8f9fa;
     flex: 1;
-    padding: 0px;
+    padding: 0;
 }
 
-.carousel-text {
-    color: #475669;
-    opacity: 0.75;
-    line-height: 200px;
+/* 轮播图样式 */
+.carousel-item {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    padding: 30px 20px 20px;
+}
+
+.carousel-title {
+    color: #fff;
     margin: 0;
-    text-align: center;
     font-size: 24px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .content {
-    width: 60%;
+    width: 75%;
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 40px 20px;
 }
 
 .section-title {
     text-align: center;
-    font-size: 28px;
+    font-size: 32px;
     color: #2c3e50;
-    margin: 30px 0;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
+    margin: 40px 0 30px;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #409eff, #66b1ff);
+    border-radius: 2px;
 }
 
 /* 介绍我们部分 - 图片垂直居中 */
 .introduction-row {
     display: flex;
     align-items: center;
+    margin-bottom: 60px;
 }
 
 .introduction-image-col {
@@ -168,37 +239,101 @@ const goToArticle = (id) => {
 .introduction-image {
     width: 100%;
     height: auto;
-    border-radius: 6px;
-    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transition: transform 0.3s ease;
+}
+
+.introduction-image:hover {
+    transform: scale(1.02);
 }
 
 .article-card {
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    background: #fff;
 }
 
 .article-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(64, 158, 255, 0.2);
+}
+
+.card-image-wrapper {
+    position: relative;
+    overflow: hidden;
 }
 
 .article-img {
     width: 100%;
-    height: 180px;
+    height: 220px;
     object-fit: cover;
-    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.article-card:hover .article-img {
+    transform: scale(1.05);
+}
+
+.card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+
+.card-content {
+    padding: 20px;
 }
 
 .article-title {
-    font-size: 16px;
-    font-weight: bold;
-    margin: 12px 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 12px;
     color: #2c3e50;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 50px;
 }
 
 .article-description {
     font-size: 14px;
-    color: #666;
-    line-height: 1.5;
+    color: #606266;
+    line-height: 1.8;
+    margin: 0 0 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 75px;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #ebeef5;
+    font-size: 13px;
+    color: #909399;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.meta-item .el-icon {
+    font-size: 14px;
 }
 
 /* 介绍内容样式 */
@@ -211,19 +346,15 @@ const goToArticle = (id) => {
 
 .introduction-content :deep(p) {
     text-indent: 2em;
-    /* 首行缩进 2 字符 */
     margin: 1.2em 0;
-    /* 段前段后距离：上 1.2em，下 1.2em */
 }
 
 .introduction-content :deep(p:first-child) {
     margin-top: 0;
-    /* 第一个段落无上边距 */
 }
 
 .introduction-content :deep(p:last-child) {
     margin-bottom: 0;
-    /* 最后一个段落无下边距 */
 }
 
 .introduction-content :deep(h1),
@@ -233,7 +364,6 @@ const goToArticle = (id) => {
 .introduction-content :deep(h5),
 .introduction-content :deep(h6) {
     margin: 1.5em 0 1em;
-    /* 标题段前段后距离 */
     color: #2c3e50;
 }
 
@@ -250,8 +380,8 @@ const goToArticle = (id) => {
 .introduction-content :deep(blockquote) {
     margin: 1em 0;
     padding: 10px 20px;
-    border-left: 4px solid #007bff;
-    background-color: #f8f9fa;
+    border-left: 4px solid #409eff;
+    background-color: #f0f7ff;
     color: #666;
 }
 
@@ -275,5 +405,48 @@ const goToArticle = (id) => {
     height: auto;
     border-radius: 5px;
     margin: 1em 0;
+}
+
+.loading {
+    padding: 40px 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .content {
+        width: 85%;
+    }
+}
+
+@media (max-width: 768px) {
+    .content {
+        width: 95%;
+        padding: 20px 10px;
+    }
+
+    .section-title {
+        font-size: 26px;
+    }
+
+    .introduction-row {
+        flex-direction: column;
+    }
+
+    .introduction-image-col {
+        margin-bottom: 20px;
+    }
+
+    .article-img {
+        height: 180px;
+    }
+
+    .article-title {
+        font-size: 16px;
+        min-height: 44px;
+    }
+
+    .article-description {
+        min-height: 63px;
+    }
 }
 </style>

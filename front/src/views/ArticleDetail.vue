@@ -5,10 +5,30 @@
             <div class="main-container">
                 <!-- 文章存在时显示内容 -->
                 <div v-if="article" class="content">
-                    <div class="article-title">{{ article.title }}</div>
+                    <div class="article-header">
+                        <div class="article-title">{{ article.title }}</div>
+                        <div class="article-summary" v-if="article.description">
+                            <el-alert
+                                :title="article.description"
+                                type="info"
+                                :closable="false"
+                                show-icon
+                            />
+                        </div>
+                    </div>
                     <div class="article-info">
-                        <span class="article-author">作者: {{ article.author }}</span>
-                        <span class="article-time">更新时间: {{ article.createTime }}</span>
+                        <span class="article-author">
+                            <el-icon><User /></el-icon>
+                            作者: {{ article.author }}
+                        </span>
+                        <span class="article-time">
+                            <el-icon><Clock /></el-icon>
+                            更新时间: {{ formatDate(article.createTime) }}
+                        </span>
+                        <span class="article-views" v-if="article.views">
+                            <el-icon><View /></el-icon>
+                            阅读: {{ article.views }}
+                        </span>
                     </div>
                     <div class="article-content" v-html="renderedContent"></div>
                 </div>
@@ -44,6 +64,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { marked } from 'marked';
 import { computed } from 'vue';
+import { User, Clock, View } from '@element-plus/icons-vue';
 import { getArticleByIdService } from '@/api/article.js'; // 导入文章详情服务函数
 
 
@@ -58,6 +79,13 @@ const renderedContent = computed(() => {
     }
     return '错误';
 });
+
+// 格式化日期
+const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
 
 const getArticleDetail = async () => {
     try {
@@ -133,22 +161,42 @@ onMounted(() => {
     letter-spacing: 1px;
 }
 
+.article-summary {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.article-summary :deep(.el-alert) {
+    background-color: #f0f7ff;
+    border: 1px solid #d9ecff;
+}
+
 .article-info {
     text-align: center;
     color: #666;
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
 }
 
-.article-author {
-    margin-right: 25px;
+.article-author,
+.article-time,
+.article-views {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 15px;
 }
 
-.article-time {
-    margin-left: 25px;
-    font-size: 15px;
+.article-author .el-icon,
+.article-time .el-icon,
+.article-views .el-icon {
+    font-size: 16px;
+    color: #409eff;
 }
 
 .article-content {

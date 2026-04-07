@@ -11,20 +11,42 @@
 
         <!-- 文章列表 -->
         <el-row :gutter="24" v-else>
-          <el-col :span="8" v-for="article in pagedArticles" :key="article.id">
+          <el-col :xs="24" :sm="12" :md="8" v-for="article in pagedArticles" :key="article.id">
             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
-              <img :src="article.firstPicture || 'https://placehold.co/300x150'" alt="封面图" class="article-img" />
-              <h3 class="article-title">{{ article.title }}</h3>
-              <p class="article-description">{{ truncate(article.description, 35) }}</p>
-
+              <div class="card-image-wrapper">
+                <img :src="article.firstPicture || 'https://placehold.co/400x250?text=暂无图片'" 
+                  alt="封面图" class="article-img" />
+                <div class="card-overlay">
+                  <el-tag size="small" type="success">阅读更多</el-tag>
+                </div>
+              </div>
+              <div class="card-content">
+                <h3 class="article-title">{{ article.title }}</h3>
+                <p class="article-description">{{ article.description || '暂无摘要' }}</p>
+                <div class="card-meta">
+                  <span class="meta-item">
+                    <el-icon><User /></el-icon>
+                    {{ article.author }}
+                  </span>
+                  <span class="meta-item">
+                    <el-icon><Clock /></el-icon>
+                    {{ formatDate(article.createTime) }}
+                  </span>
+                </div>
+              </div>
             </el-card>
           </el-col>
         </el-row>
 
         <!-- 分页 -->
         <div class="pagination">
-          <el-pagination background layout="prev, pager, next" :total="articles.length" :page-size="pageSize"
-            v-model:current-page="currentPage" />
+          <el-pagination 
+            background 
+            layout="prev, pager, next, jumper, total" 
+            :total="articles.length" 
+            :page-size="pageSize"
+            v-model:current-page="currentPage" 
+          />
         </div>
       </div>
     </el-main>
@@ -36,6 +58,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { User, Clock } from '@element-plus/icons-vue'
 import { getArticleListService } from '@/api/article.js'
 import Footer from '@/components/Footer.vue'
 
@@ -54,16 +77,10 @@ const getArticleList = async () => {
   try {
     loading.value = true
     const res = await getArticleListService()
-    articles.value = res.data
+    articles.value = res.data || []
   } catch (error) {
     console.error('获取文章列表失败:', error)
-    // 模拟数据用于演示
-    articles.value = Array.from({ length: 42 }, (_, i) => ({
-      id: i + 1,
-      title: `文章标题 ${i + 1}`,
-      description: `这是第 ${i + 1} 篇文章的摘要内容，简要描述文章主要内容，让用户快速了解文章。`,
-      img: 'https://placehold.co/300x150'
-    }))
+    articles.value = []
   } finally {
     loading.value = false
   }
@@ -80,9 +97,11 @@ const goToArticle = (id) => {
   router.push(`/article/${id}`)
 }
 
-// 摘要截断
-const truncate = (text, maxLen) => {
-  return text?.length <= maxLen ? text : text?.slice(0, maxLen) + '...'
+// 格式化日期
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
 }
 
 // 当从缓存中激活组件时调用
@@ -102,74 +121,182 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #f8f9fa;
 }
 
 .main {
-  background-color: #f5f5f5
+  flex: 1;
+  padding: 0;
 }
 
 .content {
-  width: 70%;
+  width: 80%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  padding: 40px 20px;
 }
-
 
 .section-title {
   text-align: center;
-  font-size: 28px;
+  font-size: 32px;
   color: #2c3e50;
-  margin: 0 0 30px 0;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 10px;
+  margin: 0 0 40px 0;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #409eff, #66b1ff);
+  border-radius: 2px;
 }
 
 .article-card {
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin: 20px 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  background: #fff;
 }
 
 .article-card:hover {
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
-  transform: scale(1.03);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(64, 158, 255, 0.2);
+}
+
+.card-image-wrapper {
+  position: relative;
+  overflow: hidden;
 }
 
 .article-img {
   width: 100%;
-  height: 180px;
+  height: 220px;
   object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+}
+
+.article-card:hover .article-img {
+  transform: scale(1.05);
+}
+
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.article-card:hover .card-overlay {
+  opacity: 1;
+}
+
+.card-content {
+  padding: 20px;
 }
 
 .article-title {
-  margin: 0 0 8px;
   font-size: 18px;
-  font-weight: bold;
-  color: #333;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #2c3e50;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 50px;
 }
 
 .article-description {
   font-size: 14px;
-  color: #666;
-  margin-bottom: 12px;
+  color: #606266;
+  line-height: 1.8;
+  margin: 0 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 75px;
 }
 
-.article-footer {
-  text-align: right;
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #ebeef5;
+  font-size: 13px;
+  color: #909399;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta-item .el-icon {
+  font-size: 14px;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 40px;
+  padding: 20px 0;
 }
 
 .loading {
-  padding: 20px;
+  padding: 40px 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .content {
+    width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    width: 95%;
+    padding: 20px 10px;
+  }
+
+  .section-title {
+    font-size: 26px;
+  }
+
+  .article-img {
+    height: 180px;
+  }
+
+  .article-title {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .article-description {
+    min-height: 63px;
+  }
 }
 </style>
