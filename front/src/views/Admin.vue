@@ -33,15 +33,6 @@
                             立即登录
                         </el-button>
                     </div>
-
-                    <!-- 开发模式快速入口 -->
-                    <el-divider style="margin: 20px 0;">开发调试</el-divider>
-                    <el-button type="info" @click="handleDevLogin" class="dev-login-btn">
-                        🚀 一键进入后台（开发模式）
-                    </el-button>
-                    <el-alert title="提示" type="info" :closable="false" class="dev-tip">
-                        仅用于本地开发调试，生产环境请正常登录
-                    </el-alert>
                 </el-form>
             </el-card>
         </div>
@@ -164,7 +155,8 @@
                                     <el-input type="textarea" v-model="articleForm.description" />
                                 </el-form-item>
                                 <el-form-item label="正文">
-                                    <md-editor v-model="articleForm.content" @onUploadImg="onUploadImg" />
+                                    <md-editor v-model="articleForm.content" @onUploadImg="onUploadImg"
+                                        preview-class="markdown-body" />
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="handleArticleSubmit" :loading="loading">
@@ -271,7 +263,7 @@
                                     </div>
                                 </el-form-item>
                                 <el-form-item label="介绍内容">
-                                    <md-editor v-model="introductionForm.content" />
+                                    <md-editor v-model="introductionForm.content" preview-class="markdown-body" />
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="handleIntroductionSubmit" :loading="loading">
@@ -328,7 +320,8 @@
                                     rows="3" />
                             </el-form-item>
                             <el-form-item label="正文">
-                                <md-editor v-model="editForm.content" @onUploadImg="onUploadImg" />
+                                <md-editor v-model="editForm.content" @onUploadImg="onUploadImg"
+                                    preview-class="markdown-body" />
                             </el-form-item>
                         </el-form>
                         <template #footer>
@@ -646,17 +639,7 @@ const handleLogin = async () => {
     }
 }
 
-// 2. 开发模式快速登录
-const handleDevLogin = () => {
-    localStorage.setItem('admin_token', 'dev-token-123456')
-    localStorage.setItem('adminInfo', JSON.stringify({ username: 'dev_admin', id: 1 }))
-    sessionStorage.setItem('admin_logged_in', 'true')
-    isLoggedIn.value = true
-    ElMessage.success('已进入开发模式')
-    fetchStats()
-}
-
-// 3. 菜单切换
+// 2. 菜单切换
 const handleMenuSelect = (index) => {
     if (index === 'logout') {
         ElMessageBox.confirm('确定要退出登录吗？', '提示', {
@@ -806,6 +789,20 @@ onUnmounted(() => {
     window.removeEventListener('admin-logout', onAdminLogout)
 })
 </script>
+
+
+<style>
+@import '@/assets/styles/markdown-theme.css';
+
+/* 
+  关键修复：使用 !important 和高优先级选择器确保样式生效
+  md-editor-v3 的预览区会包裹在 .md-editor-preview 中
+*/
+.md-editor-preview .markdown-body {
+    /* 继承 markdown-theme.css 中的所有样式 */
+}
+</style>
+
 
 <style scoped>
 .admin-container {
