@@ -3,7 +3,7 @@
         <!-- 主体内容 -->
         <el-main class="main">
             <!-- 走马灯 -->
-            <el-carousel height="300px" indicator-position="outside">
+            <el-carousel height="600px" indicator-position="outside">
                 <el-carousel-item v-for="item in carouselItems" :key="item.id">
                     <div class="carousel-item">
                         <img :src="item.image" :alt="item.title" class="carousel-image" />
@@ -39,8 +39,8 @@
                         <el-col :span="8" v-for="article in articles" :key="article.id">
                             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
                                 <div class="card-image-wrapper">
-                                    <img :src="article.firstPicture || 'https://placehold.co/400x250?text=暂无图片'"
-                                        alt="封面图" class="article-img" />
+                                    <img :src="getArticleImage(article.firstPicture)" alt="封面图"
+                                        class="article-img" @error="handleImageError" />
                                     <div class="card-badge">
                                         <el-tag size="small" type="primary">最新</el-tag>
                                     </div>
@@ -99,10 +99,8 @@ const introduction = ref({
 // 轮播图数据
 // 使用 Unsplash 免费图片（通过 source.unsplash.com 动态返回匹配关键词的高质量图片）
 const carouselItems = ref([
-    { id: 1, title: '关注医务人员心理健康', image: 'https://source.unsplash.com/1200x300/?medical,health' },
-    { id: 2, title: '职业丧痛研究与支持', image: 'https://source.unsplash.com/1200x300/?mental-health,therapy' },
-    { id: 3, title: '专业团队为您服务', image: 'https://source.unsplash.com/1200x300/?team,healthcare' },
-    { id: 4, title: '共同守护健康', image: 'https://source.unsplash.com/1200x300/?support,care' }
+    { id: 1, title: '关注医务人员心理健康', image: '/images/pic1.png' },
+    { id: 2, title: '职业丧痛研究与支持', image: '/images/pic2.png' },
 ])
 
 // 渲染 Markdown 内容为 HTML
@@ -151,6 +149,19 @@ const getIntroduction = async () => {
 
 const goToArticle = (id) => {
     router.push(`/article/${id}`)
+}
+
+// 获取文章图片（处理空值和无效URL）
+const getArticleImage = (firstPicture) => {
+    if (!firstPicture || firstPicture.trim() === '') {
+        return '/images/placeholder-400x220.svg'
+    }
+    return firstPicture
+}
+
+// 图片加载失败时的fallback处理
+const handleImageError = (e) => {
+    e.target.src = '/images/placeholder-400x220.svg'
 }
 
 </script>

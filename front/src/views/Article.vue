@@ -14,8 +14,8 @@
           <el-col :xs="24" :sm="12" :md="8" v-for="article in pagedArticles" :key="article.id">
             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
               <div class="card-image-wrapper">
-                <img :src="article.firstPicture || 'https://placehold.co/400x250?text=暂无图片'" 
-                  alt="封面图" class="article-img" />
+                <img :src="getArticleImage(article.firstPicture)" alt="封面图" class="article-img"
+                  @error="handleImageError" />
                 <div class="card-overlay">
                   <el-tag size="small" type="success">阅读更多</el-tag>
                 </div>
@@ -25,11 +25,15 @@
                 <p class="article-description">{{ article.description || '暂无摘要' }}</p>
                 <div class="card-meta">
                   <span class="meta-item">
-                    <el-icon><User /></el-icon>
+                    <el-icon>
+                      <User />
+                    </el-icon>
                     {{ article.author }}
                   </span>
                   <span class="meta-item">
-                    <el-icon><Clock /></el-icon>
+                    <el-icon>
+                      <Clock />
+                    </el-icon>
                     {{ formatDate(article.createTime) }}
                   </span>
                 </div>
@@ -40,13 +44,8 @@
 
         <!-- 分页 -->
         <div class="pagination">
-          <el-pagination 
-            background 
-            layout="prev, pager, next, jumper, total" 
-            :total="articles.length" 
-            :page-size="pageSize"
-            v-model:current-page="currentPage" 
-          />
+          <el-pagination background layout="prev, pager, next, jumper, total" :total="articles.length"
+            :page-size="pageSize" v-model:current-page="currentPage" />
         </div>
       </div>
     </el-main>
@@ -102,6 +101,19 @@ const formatDate = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
   return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+// 获取文章图片（处理空值和无效URL）
+const getArticleImage = (firstPicture) => {
+  if (!firstPicture || firstPicture.trim() === '') {
+    return '/images/placeholder-400x220.svg'
+  }
+  return firstPicture
+}
+
+// 图片加载失败时的fallback处理
+const handleImageError = (e) => {
+  e.target.src = '/images/placeholder-400x220.svg'
 }
 
 // 当从缓存中激活组件时调用
