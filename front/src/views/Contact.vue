@@ -1,54 +1,60 @@
 <template>
-  <div class="contact-container">
-    <div class="contact-header">
-      <h1>联系我们</h1>
-      <p class="subtitle">关注我们，获取更多相关信息</p>
-    </div>
-
-    <div class="contact-content">
-      <!-- 微信公众号 -->
-      <div class="contact-card">
-        <div class="card-icon">
-          <el-icon :size="48">
-            <ChatDotRound />
-          </el-icon>
-        </div>
-        <h2>微信公众号</h2>
-        <p class="account-name">医路同行-职业丧痛支持</p>
-        <div class="qr-code">
-          <img :src="wechatQrCode" alt="微信公众号二维码" />
-          <p>扫描二维码关注我们</p>
-        </div>
+  <el-container class="contact-container">
+    <el-main class="main">
+      <div class="contact-header">
+        <h1>联系我们</h1>
+        <p class="subtitle">关注我们，获取更多相关信息</p>
       </div>
 
-      <!-- 小红书账号 -->
-      <div class="contact-card">
-        <div class="card-icon">
-          <el-icon :size="48">
-            <Star />
-          </el-icon>
-        </div>
-        <h2>小红书账号</h2>
-        <p class="account-name">@医路同行-职业丧痛支持</p>
-        <div class="social-link">
-          <el-button type="danger" @click="openXiaohongshu">
-            <el-icon>
-              <Link />
+      <div class="contact-content">
+        <!-- 微信公众号 -->
+        <div class="contact-card">
+          <div class="card-icon">
+            <el-icon :size="48">
+              <ChatDotRound />
             </el-icon>
-            前往主页
-          </el-button>
+          </div>
+          <h2>微信公众号</h2>
+          <p class="account-name">医路同行-职业丧痛支持</p>
+          <div class="qr-code">
+            <img :src="wechatQrCode" alt="微信公众号二维码" />
+            <p>扫描二维码关注我们</p>
+          </div>
+        </div>
+
+        <!-- 小红书账号 -->
+        <div class="contact-card">
+          <div class="card-icon">
+            <el-icon :size="48">
+              <Star />
+            </el-icon>
+          </div>
+          <h2>小红书账号</h2>
+          <p class="account-name">@医路同行-职业丧痛支持</p>
+          <div class="social-link">
+            <el-button type="danger" @click="openXiaohongshu">
+              <el-icon>
+                <Link />
+              </el-icon>
+              前往主页
+            </el-button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="contact-footer">
-      <p>如有合作意向或其他问题，请通过上述平台联系我们</p>
-    </div>
-  </div>
+      <div class="contact-footer">
+        <p>如有合作意向或其他问题，请通过上述平台联系我们</p>
+      </div>
+    </el-main>
+
+    <!-- 页脚 -->
+    <Footer />
+  </el-container>
 </template>
 
 <script setup>
 import { ChatDotRound, Star, Link } from '@element-plus/icons-vue'
+import Footer from '@/components/Footer.vue'
 import wechatQrCode from '@/assets/QRcode.jpg'
 
 // TODO: 请将 wechat-qr.jpg 放到 src/assets/ 目录下
@@ -62,9 +68,15 @@ const openXiaohongshu = () => {
 
 <style scoped>
 .contact-container {
-  min-height: calc(100vh - 110px);
-  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background-color: #f5f7fa;
+}
+
+.main {
+  flex: 1;
+  padding: 40px 20px;
 }
 
 .contact-header {

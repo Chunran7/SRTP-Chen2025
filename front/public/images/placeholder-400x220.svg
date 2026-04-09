@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+  <!-- 灰色背景 -->
+  <rect width="400" height="220" fill="#f0f2f5"/>
+  
+  <!-- 图片图标 -->
+  <g transform="translate(160, 70)">
+    <!-- 外框 -->
+    <rect x="0" y="0" width="80" height="60" rx="4" fill="#d9d9d9"/>
+    <!-- 山峰 -->
+    <polygon points="10,50 30,20 50,50" fill="#bfbfbf"/>
+    <polygon points="35,50 50,25 65,50" fill="#bfbfbf"/>
+    <!-- 太阳 -->
+    <circle cx="60" cy="15" r="8" fill="#bfbfbf"/>
+  </g>
+  
+  <!-- 文字提示 -->
+  <text x="200" y="155" font-family="Arial, sans-serif" font-size="14" fill="#999" text-anchor="middle">暂无图片</text>
+</svg>
