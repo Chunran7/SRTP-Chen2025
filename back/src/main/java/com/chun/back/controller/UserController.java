@@ -1,8 +1,5 @@
 package com.chun.back.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,9 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chun.back.pojo.Result;
 import com.chun.back.service.UserService;
-import com.chun.back.utils.JwtUtil;
-import com.chun.back.utils.Md5Util;
-
 import jakarta.validation.constraints.Pattern;
 
 import com.chun.back.pojo.User;
@@ -65,24 +59,7 @@ public class UserController {
 
     @PostMapping("/login")
     public Result login(@Pattern(regexp = "^\\S{5,16}$")String username,@Pattern(regexp = "^\\S{5,16}$")String password){
-        User u=userService.findByUserName(username);
-        if(u!=null){
-            //用户名存在
-            if(Md5Util.getMD5String(password).equals(u.getPassword())){
-                //密码正确
-                Map<String,Object> claims=new HashMap<>();
-                claims.put("id",u.getId());
-                claims.put("username",u.getUsername());
-                String token=JwtUtil.genToken(claims);
-                return Result.success(token);
-            }else{
-                //密码错误
-                return Result.error("密码错误");
-            }
-        }
-        else{
-            //用户名不存在
-            return Result.error("用户名不存在");
-        }
+    // 用户登录逻辑已移除（系统不再强制用户端登录）
+    return Result.error("用户登录已被禁用");
     }
 }

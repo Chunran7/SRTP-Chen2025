@@ -10,9 +10,6 @@
       <el-menu-item index="/article" @click="router.push('/article')">文章</el-menu-item>
       <el-menu-item index="/contact" @click="router.push('/contact')">联系我们</el-menu-item>
     </el-menu>
-    <div class="navbar-right">
-      <el-button v-if="!isLoggedIn" @click="router.push('/login')" type="primary">登录/注册</el-button>
-    </div>
   </el-header>
 </template>
 
@@ -55,14 +52,5 @@ router.afterEach(() => {
   height: 40px;
   width: auto;
   margin: 10px;
-}
-
-.navbar-right {
-  position: absolute;
-  right: 30px;
-  top: 0;
-  height: 60px;
-  display: flex;
-  align-items: center;
 }
 </style>

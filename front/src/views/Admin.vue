@@ -10,9 +10,6 @@
 
             <el-card class="login-box" shadow="hover">
                 <div class="login-header">
-                    <div class="login-logo-container">
-                        <img src="@/assets/logo.png" alt="Logo" class="login-logo" />
-                    </div>
                     <h2 class="login-title">后台管理系统</h2>
                     <p class="login-subtitle">安全登录，高效管理</p>
                 </div>
@@ -897,28 +894,13 @@ onUnmounted(() => {
     padding: 30px 0 20px;
 }
 
-.login-logo-container {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 20px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-    transition: all 0.3s ease;
-}
-
-.login-logo-container:hover {
-    transform: scale(1.05);
-    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
-}
 
 .login-logo {
-    width: 60px;
-    height: 60px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 6px 18px rgba(79, 110, 247, 0.25);
 }
 
 .login-title {

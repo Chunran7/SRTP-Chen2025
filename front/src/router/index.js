@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 //导入组件
-import LoginVue from "@/views/Login.vue";
 import HomeVue from "@/views/Home.vue";
 import ArticleVue from "@/views/Article.vue";
 import ArticleDetailVue from "@/views/ArticleDetail.vue";
@@ -16,10 +15,7 @@ const routes = [
     name: "Home",
     component: HomeVue,
   },
-  {
-    path: "/login",
-    component: LoginVue,
-  },
+  // 用户登录页面保留文件以便后续使用，但业务不再导航到该页面，故移除对应路由
   {
     path: "/",
     redirect: "/home",
@@ -81,9 +77,9 @@ router.beforeEach((to, from, next) => {
       // 有 token，允许访问
       next();
     } else {
-      // 没有 token，重定向到登录页
-      alert("访问该模块前，请先登录");
-      next("/login");
+      // 没有 token，不导航到登录页（用户端登录已禁用），改为回到首页并提示
+      alert("访问该模块前，请先登录（用户登录已禁用，返回首页）");
+      next("/home");
     }
   } else {
     // 不需要认证的路由，直接访问
