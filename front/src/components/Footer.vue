@@ -9,8 +9,9 @@
 
       <div class="footer-section">
         <h3 class="footer-title">联系方式</h3>
-        <p class="footer-text">邮箱: contact@example.com</p>
-        <p class="footer-text">电话: 400-xxx-xxxx</p>
+        <p class="footer-text">邮箱: cqchen@seu.edu.cn</p>
+        <el-link :underline="false" href="/contact" class="footer-link">微信公众号：医路同行-职业丧痛支持</el-link>
+        <el-link :underline="false" href="/contact" class="footer-link">小红书：医路同行-职业丧痛支持</el-link>
       </div>
 
       <div class="footer-section">

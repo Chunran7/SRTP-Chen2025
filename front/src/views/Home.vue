@@ -39,7 +39,7 @@
                         <el-col :span="8" v-for="article in articles" :key="article.id">
                             <el-card shadow="hover" class="article-card" @click="goToArticle(article.id)">
                                 <div class="card-image-wrapper">
-                                    <img :src="article.firstPicture || 'https://placehold.co/400x250?text=暂无图片'" 
+                                    <img :src="article.firstPicture || 'https://placehold.co/400x250?text=暂无图片'"
                                         alt="封面图" class="article-img" />
                                     <div class="card-badge">
                                         <el-tag size="small" type="primary">最新</el-tag>
@@ -50,11 +50,15 @@
                                     <p class="article-description">{{ article.description || '暂无摘要' }}</p>
                                     <div class="card-meta">
                                         <span class="meta-item">
-                                            <el-icon><User /></el-icon>
+                                            <el-icon>
+                                                <User />
+                                            </el-icon>
                                             {{ article.author }}
                                         </span>
                                         <span class="meta-item">
-                                            <el-icon><Clock /></el-icon>
+                                            <el-icon>
+                                                <Clock />
+                                            </el-icon>
                                             {{ formatDate(article.createTime) }}
                                         </span>
                                     </div>
@@ -93,11 +97,12 @@ const introduction = ref({
 })
 
 // 轮播图数据
+// 使用 Unsplash 免费图片（通过 source.unsplash.com 动态返回匹配关键词的高质量图片）
 const carouselItems = ref([
-    { id: 1, title: '关注医务人员心理健康', image: 'https://placehold.co/1200x300?text=关爱医务人员' },
-    { id: 2, title: '职业丧痛研究与支持', image: 'https://placehold.co/1200x300?text=职业支持' },
-    { id: 3, title: '专业团队为您服务', image: 'https://placehold.co/1200x300?text=专业团队' },
-    { id: 4, title: '共同守护健康', image: 'https://placehold.co/1200x300?text=守护健康' }
+    { id: 1, title: '关注医务人员心理健康', image: 'https://source.unsplash.com/1200x300/?medical,health' },
+    { id: 2, title: '职业丧痛研究与支持', image: 'https://source.unsplash.com/1200x300/?mental-health,therapy' },
+    { id: 3, title: '专业团队为您服务', image: 'https://source.unsplash.com/1200x300/?team,healthcare' },
+    { id: 4, title: '共同守护健康', image: 'https://source.unsplash.com/1200x300/?support,care' }
 ])
 
 // 渲染 Markdown 内容为 HTML

@@ -29,7 +29,7 @@
           </el-icon>
         </div>
         <h2>小红书账号</h2>
-        <p class="account-name">@医路同行</p>
+        <p class="account-name">@医路同行-职业丧痛支持</p>
         <div class="social-link">
           <el-button type="danger" @click="openXiaohongshu">
             <el-icon>
