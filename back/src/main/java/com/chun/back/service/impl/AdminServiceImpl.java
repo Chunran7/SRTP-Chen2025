@@ -25,6 +25,7 @@ public class AdminServiceImpl implements AdminService {
 
         // 2. 如果管理员不存在，返回 null
         if (admin == null) {
+            System.out.println("调试：数据库中未找到用户 -> " + username);
             return null;
         }
 
@@ -33,6 +34,10 @@ public class AdminServiceImpl implements AdminService {
         if (!Md5Util.checkPassword(password, admin.getPassword())) {
             return null;
         }
+        String inputPasswordMd5 = Md5Util.getMD5String(password);
+        String dbPassword = admin.getPassword();
+        System.out.println("调试：输入密码的MD5 -> " + inputPasswordMd5);
+        System.out.println("调试：数据库中的密码 -> " + dbPassword);
 
         // 4. 验证通过，返回管理员信息
         return admin;

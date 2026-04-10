@@ -5,11 +5,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.chun.back.interceptors.LoginInterceptor;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+        @Autowired
+        private LoginInterceptor loginInterceptor;
 
         @Value("${file.upload-path}")
         private String uploadPath;
@@ -33,9 +38,17 @@ public class WebConfig implements WebMvcConfigurer {
                                 .allowedOrigins(
                                                 "http://1.116.117.203", // 服务器IP
                                                 "https://1.116.117.203", // HTTPS版本
-                                                "http://localhost:5173", // 本地开发环保（可选）
-                                                "http://127.0.0.1:5173" // 本地开发环保（可选）
-                                )
+                                                // 本地开发环境（可选）
+                                                "http://localhost:5173",
+                                                "http://127.0.0.1:5173",
+                                                // 生产域名：允许前端在生产域下发起请求（HTTP/HTTPS）
+                                                "https://www.yilutongxing-zyst.com",
+                                                "http://www.yilutongxing-zyst.com",
+                                                "https://yilutongxing-zyst.com",
+                                                "http://yilutongxing-zyst.com")
+                                // 也兼容子域名匹配（若需要更灵活的模式匹配，取消注释下一行并视情况使用）
+                                // .allowedOriginPatterns("https://*.yilutongxing-zyst.com",
+                                // "http://*.yilutongxing-zyst.com")
                                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                                 .allowedHeaders("*")
                                 .allowCredentials(true)
@@ -44,8 +57,13 @@ public class WebConfig implements WebMvcConfigurer {
 
         @Override
         public void addInterceptors(InterceptorRegistry registry) {
-                // 目前不启用全局登录拦截器（用户端登录已不强制），
-                // 如果未来需要恢复，请在这里注册相应拦截器
+                // 注册登录拦截器：保护管理员与写操作接口
+                registry.addInterceptor(loginInterceptor)
+                                .addPathPatterns("/admin/**", "/article/**")
+                                // 登录接口放行
+                                .excludePathPatterns("/admin/login")
+                                // 静态资源与跨域预检放行
+                                .excludePathPatterns("/images/**", "/favicon.ico", "/**/*.css", "/**/*.js");
         }
 
         @Override

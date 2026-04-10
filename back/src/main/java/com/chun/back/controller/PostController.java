@@ -24,22 +24,10 @@ public class PostController {
      */
     @PostMapping
     public Result createPost(@RequestBody Post post, HttpServletRequest request) {
-        // 从拦截器中取出解析好的claims
-        Object c = request.getAttribute("claims");
-        if (c == null) {
-            return Result.error("需要登录");
-        }
-        @SuppressWarnings("unchecked")
-        java.util.Map<String, Object> claims = (java.util.Map<String, Object>) c;
-        // 设置当前登录用户id到帖子实体中
-        Object idObj = claims.get("id");
-        if (idObj instanceof Number) {
-            post.setUserId(((Number) idObj).longValue());
-        } else if (idObj instanceof String) {
-            try {
-                post.setUserId(Long.parseLong((String) idObj));
-            } catch (NumberFormatException ignored) {
-            }
+        // 用户端公开接口：允许匿名发布（若前端提供 userId，可直接带入）
+        // 简单校验：标题和内容不能为空
+        if (post == null || post.getContent() == null || post.getContent().trim().isEmpty()) {
+            return Result.error("内容不能为空");
         }
 
         boolean success = postService.createPost(post);
